@@ -1,12 +1,12 @@
 using DataAccess.Context;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Web.Data;
 using DotNetEnv;
+using DTO.DataAccess.DTO;
 
-Env.Load();
+Env.TraversePath().Load();
+
 var builder = WebApplication.CreateBuilder(args);
-
 var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING") ??
                        throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
@@ -15,8 +15,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddDefaultIdentity<AppUserEntity>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddEntityFrameworkStores<AppDbContext>();
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
