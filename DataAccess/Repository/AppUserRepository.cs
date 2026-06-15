@@ -1,4 +1,5 @@
 using Base.DataAccess.EF;
+using Contracts.DataAccess;
 using DataAccess.Context;
 using Domain;
 using DTO.DataAccess.DTO;
@@ -6,7 +7,7 @@ using DTO.DataAccess.Mapper;
 
 namespace DataAccess.Repository;
 
-public class AppUserRepository : BaseRepository<AppUser, AppUserEntity, AppUserEntityMapper>
+public class AppUserRepository : BaseRepository<AppUser, AppUserEntity, AppUserEntityMapper>, IAppUserRepository
 {
     public AppUserRepository(AppDbContext repositoryDbContext, AppUserEntityMapper repositoryMapper) 
         : base(repositoryDbContext, repositoryMapper)

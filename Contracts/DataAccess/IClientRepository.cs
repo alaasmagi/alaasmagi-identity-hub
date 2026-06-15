@@ -1,9 +1,9 @@
 using Base.Contracts.DataAccess;
-using DTO.DataAccess.DTO;
+using Domain;
 
 namespace Contracts.DataAccess;
 
-public interface IClientRepository : IBaseRepository<ClientEntity>
+public interface IClientRepository : IBaseRepository<Client>
 {
     
 }

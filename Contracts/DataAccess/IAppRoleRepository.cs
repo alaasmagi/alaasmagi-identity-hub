@@ -1,9 +1,9 @@
 using Base.Contracts.DataAccess;
-using DTO.DataAccess.DTO;
+using Domain;
 
 namespace Contracts.DataAccess;
 
-public interface IAppRoleRepository : IBaseRepository<AppRoleEntity>
+public interface IAppRoleRepository : IBaseRepository<AppRole>
 {
     
 }
