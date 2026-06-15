@@ -1,0 +1,168 @@
+schema: spec-driven
+
+# Project context (optional)
+# This is shown to AI when creating artifacts.
+# Add your tech stack, conventions, style guides, domain knowledge, etc.
+# Example:
+#   context: |
+#     Tech stack: TypeScript, React, Node.js
+#     We use conventional commits
+#     Domain: e-commerce platform
+schema: spec-driven
+
+context: |
+  Project overview
+  - Centralized ASP.NET Identity authentication service
+  - Acts as the sole identity provider for multiple registered client applications
+  - Handles user management, consent flow, JWT/cookie token issuance, 2FA, and external logins
+  - Admin UI is MVC-based and lives inside the auth service itself
+  - Other services authenticate by validating JWT tokens issued by this service
+
+  Tech stack
+  - ASP.NET Core (Web API + MVC Razor Pages)
+  - ASP.NET Core Identity with custom AppUser and AppRole
+  - Entity Framework Core with PostgreSQL
+  - MediatR (CQRS — Commands and Queries)
+  - FluentValidation
+  - Result<T> pattern for business logic failures
+
+  Solution architecture
+  - Domain — pure entities and enums only
+  - Application — MediatR commands, queries, validators, Result<T>
+  - Infrastructure — ITokenService, IEmailService, ISecurityEventService implementations
+  - DataAccess — repository implementations and AppDbContext
+  - Web — API controllers + MVC Razor Pages admin UI
+  - Keep the current structure stable and do not reorganize folders unless absolutely necessary
+
+  Domain model
+  - AppUser : BaseIdentityUser (extends IdentityUser<Guid>)
+    - FullName, ProfilePictureUrl, IsActive, IsBanned, BanReason
+    - Navigation: ICollection<AppUserClient>? UserClients
+  - AppRole : BaseIdentityRole (extends IdentityRole<Guid>)
+    - ClientId (Guid)
+    - Navigation: Client?
+  - Client : BaseEntity
+    - Name, ClientId (Guid, unique), ClientSecretHash, AllowedOrigins, IsActive
+    - RegistrationType (ERegistrationType enum)
+    - Navigation: ICollection<AppUserClient>?, ICollection<AppRole>?
+  - AppUserClient : BaseEntity
+    - UserId (Guid), ClientId (Guid), Status (EUserClientStatus)
+    - GrantedAt, GrantedBy, RevokedAt, RevokedBy, RevokeReason
+    - ConsentGivenAt, ConsentIp
+  - SecurityEvent : BaseEntityUser
+    - UserId (Guid), ClientId (Guid?), Type (ESecurityEventType)
+    - IpAddress, UserAgent, Timestamp
+  - ERegistrationType: Open, InviteOnly, RequiresApproval
+  - EUserClientStatus: Active, Pending, Revoked
+  - ESecurityEventType: Login, Logout, TokenRefresh, FailedAttempt,
+      PasswordChanged, TwoFactorEnabled, TwoFactorDisabled,
+      ConsentGiven, ConsentRevoked, AccountBanned, AccountUnbanned
+
+  Identity and token rules
+  - ASP.NET Core Identity manages users and roles via UserManager<AppUser>,
+    RoleManager<AppRole>, SignInManager<AppUser>
+  - JWT tokens are issued for API clients, cookies for MVC clients
+  - Both JWT and cookie contain the same claims built dynamically at token generation time
+  - Claims are NEVER stored in AspNetUserClaims or AspNetRoleClaims
+  - Claims are built at runtime: sub, email, aud (Client.ClientId), roles (filtered by ClientId)
+  - AppRole.ClientId scopes roles to a specific client
+  - aud claim ensures tokens are only valid for the intended client
+  - Refresh tokens and temp tokens are stored in AspNetUserTokens via
+    UserManager.SetAuthenticationTokenAsync
+  - ConsentToken expires in 10 minutes
+  - TempToken (2FA) is short-lived
+
+  Repository interfaces (already implemented, inject via DI)
+  - IAppUserRepository
+  - IAppRoleRepository
+  - IAppUserClientRepository
+  - IClientRepository
+  - ISecurityEventRepository
+  - Each exposes standard CRUD methods: GetByIdAsync, AddAsync, UpdateAsync, DeleteAsync, etc.
+  - Use repositories for entity operations
+  - Use UserManager/RoleManager/SignInManager for Identity-specific operations
+
+  Infrastructure interfaces (already implemented, inject via DI)
+  - ITokenService
+    - GenerateAccessToken(AppUser, Client, IList<string> roles) → string
+    - GenerateRefreshToken() → string
+    - GenerateAuthCode(string userId, string clientId, string redirectUri) → string
+    - ValidateAuthCode(string code) → AuthCodePayload?
+  - IEmailService
+    - SendEmailConfirmationAsync(AppUser, string token)
+    - SendPasswordResetAsync(AppUser, string token)
+  - ISecurityEventService
+    - LogAsync(ESecurityEventType, AppUser, Client?, string? ip, string? userAgent)
+
+  Application layer rules
+  - Use MediatR CQRS — every command and query is a separate file
+  - Handler and FluentValidation Validator live in the same file as the Command/Query
+  - All handlers are internal sealed classes
+  - Return Result<T> for all operations — never throw exceptions for business logic failures
+  - Never use AspNetUserClaims or AspNetRoleClaims — no AddClaimAsync calls anywhere
+  - Log a SecurityEvent at the end of every authentication-related handler
+  - Never reveal whether an email exists in register or password reset error messages
+  - ClientSecret is always compared against ClientSecretHash
+  - Client is always looked up by Client.ClientId (Guid), not Client.Id
+
+  Auth flow rules
+  - Login requires ClientId — auth is always client-scoped
+  - If no UserClient exists after authentication → return RequiresConsent + ConsentToken
+  - If UserClient.Status == Pending → return error AwaitingApproval
+  - If UserClient.Status == Revoked → return error AccessRevoked
+  - If 2FA enabled → return RequiresTwoFactor + TempToken before issuing real tokens
+  - Consent flow respects Client.RegistrationType:
+    - Open → create UserClient (Active), assign default role, issue tokens
+    - InviteOnly → return error NotInvited
+    - RequiresApproval → create UserClient (Pending), return Status: Pending
+  - External login (Google, Microsoft) confirms email immediately
+  - MVC services receive an auth code, exchange it for claims, build their own cookie
+  - TenantId for Microsoft login is passed by the client at challenge time, not stored in DB
+  - AllowedOrigins on Client is validated against redirectUri on every auth code exchange
+
+  Code style
+  - Nullable reference types enabled
+  - File-scoped namespaces
+  - Use default! for required string properties
+  - Keep classes small and focused
+  - No ViewBag or ViewData
+  - Use ViewModels for MVC views that need more than one entity
+  - Prefer explicit code over reflection-heavy abstractions
+
+  Web rules
+  - API controllers handle JWT flow (register, login, refresh, logout, 2FA, consent, external)
+  - Razor Pages handle admin UI (users, clients, roles, security events)
+  - Admin Razor Pages use cookie authentication
+  - API controllers use JWT bearer authentication
+  - Controllers call MediatR — no business logic in controllers
+
+  Output expectations
+  - Prefer incremental minimal changes that fit the current solution structure
+  - Do not rename existing projects or reorganize folders
+  - When implementing a feature produce all required commands, queries, validators,
+    Result types, and controller/page wiring needed for that feature
+  - Keep the solution consistent with Domain, Application, DataAccess, Infrastructure,
+    and Web separation
+  MVC flow rules
+  - There are two distinct MVC scenarios, do not confuse them
+
+External MVC service flow (federated login)
+  - An external MVC application redirects the user to the auth service login page
+    passing clientId and redirectUri as query parameters
+  - The user authenticates on the auth service Razor Pages (login, 2FA, consent)
+  - After successful authentication the auth service redirects back to the external
+    service redirectUri with a short-lived auth code as a query parameter
+  - The external service calls POST /auth/token/exchange with the auth code,
+    its clientId, and clientSecret to receive claims
+  - The external service builds its own cookie from those claims
+  - The auth service Razor Pages for this flow live under /auth/* routes
+  - These pages are unauthenticated entry points — no cookie required to reach them
+
+Admin UI flow (internal management)
+  - The auth service has its own admin Razor Pages for managing users, clients,
+    roles, and security events
+  - Admin pages live under /admin/* routes
+  - Admin pages require the auth service's own cookie session with an Admin role
+  - Admin pages call MediatR directly — no API roundtrip
+  - Admin authentication uses CookieAuthenticationDefaults scheme
+  - Admin cookie is scoped to the auth service only and is not shared with external services
