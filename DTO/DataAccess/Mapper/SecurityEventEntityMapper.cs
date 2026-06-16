@@ -12,6 +12,8 @@ public class SecurityEventEntityMapper : IMapper<SecurityEvent, SecurityEventEnt
 
         return new SecurityEvent
         {
+            Id = entity.Id,
+            UserId = entity.UserId,
             ClientId = entity.ClientId,
             Type = entity.Type,
             IpAddress = entity.IpAddress,
@@ -31,6 +33,8 @@ public class SecurityEventEntityMapper : IMapper<SecurityEvent, SecurityEventEnt
 
         return new SecurityEventEntity
         {
+            Id = entity.Id,
+            UserId = entity.UserId,
             ClientId = entity.ClientId,
             Type = entity.Type,
             IpAddress = entity.IpAddress,

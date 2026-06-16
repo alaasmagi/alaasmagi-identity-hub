@@ -12,6 +12,7 @@ public class ClientEntityMapper : IMapper<Client, ClientEntity>
 
         return new Client
         {
+            Id = entity.Id,
             Name = entity.Name,
             ClientId = entity.ClientId,
             ClientSecretHash = entity.ClientSecretHash,
@@ -32,6 +33,7 @@ public class ClientEntityMapper : IMapper<Client, ClientEntity>
 
         return new ClientEntity
         {
+            Id = entity.Id,
             Name = entity.Name,
             ClientId = entity.ClientId,
             ClientSecretHash = entity.ClientSecretHash,

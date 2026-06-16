@@ -1,15 +1,5 @@
 schema: spec-driven
 
-# Project context (optional)
-# This is shown to AI when creating artifacts.
-# Add your tech stack, conventions, style guides, domain knowledge, etc.
-# Example:
-#   context: |
-#     Tech stack: TypeScript, React, Node.js
-#     We use conventional commits
-#     Domain: e-commerce platform
-schema: spec-driven
-
 context: |
   Project overview
   - Centralized ASP.NET Identity authentication service
@@ -22,13 +12,13 @@ context: |
   - ASP.NET Core (Web API + MVC Razor Pages)
   - ASP.NET Core Identity with custom AppUser and AppRole
   - Entity Framework Core with PostgreSQL
-  - MediatR (CQRS — Commands and Queries)
+  - Plain application services with interfaces
   - FluentValidation
   - Result<T> pattern for business logic failures
 
   Solution architecture
   - Domain — pure entities and enums only
-  - Application — MediatR commands, queries, validators, Result<T>
+  - Application — service interfaces, service implementations, validators, Result<T>
   - Infrastructure — ITokenService, IEmailService, ISecurityEventService implementations
   - DataAccess — repository implementations and AppDbContext
   - Web — API controllers + MVC Razor Pages admin UI
@@ -95,9 +85,8 @@ context: |
     - LogAsync(ESecurityEventType, AppUser, Client?, string? ip, string? userAgent)
 
   Application layer rules
-  - Use MediatR CQRS — every command and query is a separate file
-  - Handler and FluentValidation Validator live in the same file as the Command/Query
-  - All handlers are internal sealed classes
+  - Use plain service classes with interfaces; do not introduce MediatR
+  - Every request DTO passed into a service method has a corresponding FluentValidation validator
   - Return Result<T> for all operations — never throw exceptions for business logic failures
   - Never use AspNetUserClaims or AspNetRoleClaims — no AddClaimAsync calls anywhere
   - Log a SecurityEvent at the end of every authentication-related handler
@@ -134,7 +123,7 @@ context: |
   - Razor Pages handle admin UI (users, clients, roles, security events)
   - Admin Razor Pages use cookie authentication
   - API controllers use JWT bearer authentication
-  - Controllers call MediatR — no business logic in controllers
+  - Controllers and Razor Pages call application services — no business logic in presentation code
 
   Output expectations
   - Prefer incremental minimal changes that fit the current solution structure
@@ -146,7 +135,7 @@ context: |
   MVC flow rules
   - There are two distinct MVC scenarios, do not confuse them
 
-External MVC service flow (federated login)
+  External MVC service flow (federated login)
   - An external MVC application redirects the user to the auth service login page
     passing clientId and redirectUri as query parameters
   - The user authenticates on the auth service Razor Pages (login, 2FA, consent)
@@ -158,11 +147,11 @@ External MVC service flow (federated login)
   - The auth service Razor Pages for this flow live under /auth/* routes
   - These pages are unauthenticated entry points — no cookie required to reach them
 
-Admin UI flow (internal management)
+  Admin UI flow (internal management)
   - The auth service has its own admin Razor Pages for managing users, clients,
     roles, and security events
   - Admin pages live under /admin/* routes
   - Admin pages require the auth service's own cookie session with an Admin role
-  - Admin pages call MediatR directly — no API roundtrip
+  - Admin pages call IAdminService directly — no API roundtrip
   - Admin authentication uses CookieAuthenticationDefaults scheme
   - Admin cookie is scoped to the auth service only and is not shared with external services

@@ -12,7 +12,8 @@ public class AppUserClientEntityMapper : IMapper<AppUserClient, AppUserClientEnt
 
         return new AppUserClient
         {
-            UserId = entity.User?.Id ?? Guid.Empty,
+            Id = entity.Id,
+            UserId = entity.UserId,
             User = entity.User is null
                 ? null
                 : new AppUser
@@ -49,6 +50,8 @@ public class AppUserClientEntityMapper : IMapper<AppUserClient, AppUserClientEnt
 
         return new AppUserClientEntity
         {
+            Id = entity.Id,
+            UserId = entity.UserId,
             User = entity.User is null
                 ? null
                 : new AppUserEntity
