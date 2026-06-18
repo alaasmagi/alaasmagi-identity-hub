@@ -6,6 +6,7 @@ using Application.Common.Auth;
 using Application.Common.Validation;
 using Contracts.DataAccess;
 using Domain;
+using DTO.DataAccess.DTO;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +15,7 @@ namespace Application.Admin;
 
 public sealed class AdminService : IAdminService
 {
-    private readonly UserManager<AppUser> _userManager;
+    private readonly UserManager<AppUserEntity> _userManager;
     private readonly IAppUserClientRepository _userClientRepository;
     private readonly ISecurityEventRepository _securityEventRepository;
     private readonly ISecurityEventService _securityEventService;
@@ -26,7 +27,7 @@ public sealed class AdminService : IAdminService
     private readonly IValidator<GetSecurityEventsRequest> _getSecurityEventsValidator;
 
     public AdminService(
-        UserManager<AppUser> userManager,
+        UserManager<AppUserEntity> userManager,
         IAppUserClientRepository userClientRepository,
         ISecurityEventRepository securityEventRepository,
         ISecurityEventService securityEventService,
@@ -101,7 +102,7 @@ public sealed class AdminService : IAdminService
         if (!updateResult.Succeeded) return Result<Unit>.Failure("UserUpdateFailed");
 
         await _authWorkflow.RevokeAllRefreshTokensAsync(user);
-        await _securityEventService.LogAsync(ESecurityEventType.AccountBanned, user, null, null, null);
+        await _securityEventService.LogAsync(ESecurityEventType.AccountBanned, user.ToDomainUser(), null, null, null);
         return Result<Unit>.Success(Unit.Value);
     }
 
@@ -121,7 +122,7 @@ public sealed class AdminService : IAdminService
         var updateResult = await _userManager.UpdateAsync(user);
         if (!updateResult.Succeeded) return Result<Unit>.Failure("UserUpdateFailed");
 
-        await _securityEventService.LogAsync(ESecurityEventType.AccountUnbanned, user, null, null, null);
+        await _securityEventService.LogAsync(ESecurityEventType.AccountUnbanned, user.ToDomainUser(), null, null, null);
         return Result<Unit>.Success(Unit.Value);
     }
 

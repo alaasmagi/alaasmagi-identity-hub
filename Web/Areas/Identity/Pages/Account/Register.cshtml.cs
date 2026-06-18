@@ -37,6 +37,7 @@ public class RegisterModel : PageModel
     public string? ReturnUrl { get; set; }
 
     public string? ClientName { get; private set; }
+    public bool MissingClientContext { get; private set; }
     public IReadOnlyList<string> ExternalProviders { get; private set; } = [];
 
     public sealed class InputModel
@@ -89,12 +90,14 @@ public class RegisterModel : PageModel
     {
         if (ClientId == Guid.Empty)
         {
+            MissingClientContext = true;
             ExternalProviders = [];
             return;
         }
 
         var client = await _clientRepository.GetByClientIdAsync(ClientId);
         ClientName = client?.Name;
+        MissingClientContext = client is null;
 
         var providers = await _externalAuthService.GetProvidersAsync(ClientId);
         ExternalProviders = providers.IsSuccess && providers.Value is not null

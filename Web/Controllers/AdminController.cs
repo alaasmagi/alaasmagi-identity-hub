@@ -3,7 +3,6 @@ using Application.Admin.Requests;
 using Application.Admin.Responses;
 using Application.Common;
 using Domain;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Web.Contracts.Requests;
@@ -18,7 +17,7 @@ namespace Web.Controllers;
 [Route("api/admin")]
 [Produces("application/json")]
 [Tags("Admin")]
-[Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme, Roles = "Admin")]
+[Authorize(AuthenticationSchemes = "Identity.Application", Roles = "Admin")]
 public sealed class AdminController : ApiControllerBase
 {
     private readonly IAdminService _adminService;

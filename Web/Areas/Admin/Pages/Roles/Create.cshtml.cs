@@ -47,7 +47,12 @@ public class CreateModel : PageModel
         {
             Name = Input.Name,
             NormalizedName = Input.Name.ToUpperInvariant(),
-            ClientId = Input.ClientId
+            ClientId = Input.ClientId,
+            CreatedBy = User.Identity?.Name ?? "admin",
+            CreatedAt = DateTime.UtcNow,
+            UpdatedBy = User.Identity?.Name ?? "admin",
+            UpdatedAt = DateTime.UtcNow,
+            ConcurrencyToken = Guid.NewGuid().ToString("N")
         });
         await _context.SaveChangesAsync();
 

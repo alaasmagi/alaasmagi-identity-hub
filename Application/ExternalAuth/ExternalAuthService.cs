@@ -7,6 +7,7 @@ using Application.ExternalAuth.Requests;
 using Application.ExternalAuth.Responses;
 using Contracts.DataAccess;
 using Domain;
+using DTO.DataAccess.DTO;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
@@ -15,8 +16,8 @@ namespace Application.ExternalAuth;
 
 public sealed class ExternalAuthService : IExternalAuthService
 {
-    private readonly UserManager<AppUser> _userManager;
-    private readonly SignInManager<AppUser> _signInManager;
+    private readonly UserManager<AppUserEntity> _userManager;
+    private readonly SignInManager<AppUserEntity> _signInManager;
     private readonly IAuthenticationSchemeProvider _schemeProvider;
     private readonly IAppUserClientRepository _userClientRepository;
     private readonly ITokenService _tokenService;
@@ -26,8 +27,8 @@ public sealed class ExternalAuthService : IExternalAuthService
     private readonly IValidator<ExchangeCodeRequest> _exchangeValidator;
 
     public ExternalAuthService(
-        UserManager<AppUser> userManager,
-        SignInManager<AppUser> signInManager,
+        UserManager<AppUserEntity> userManager,
+        SignInManager<AppUserEntity> signInManager,
         IAuthenticationSchemeProvider schemeProvider,
         IAppUserClientRepository userClientRepository,
         ITokenService tokenService,
@@ -92,13 +93,18 @@ public sealed class ExternalAuthService : IExternalAuthService
             user = await _userManager.FindByEmailAsync(email);
             if (user is null)
             {
-                user = new AppUser
+                user = new AppUserEntity
                 {
                     Email = email,
                     UserName = email,
                     FullName = info.Principal.FindFirstValue(ClaimTypes.Name) ?? email,
                     EmailConfirmed = true,
-                    IsActive = true
+                    IsActive = true,
+                    CreatedBy = email,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedBy = email,
+                    UpdatedAt = DateTime.UtcNow,
+                    ConcurrencyToken = Guid.NewGuid().ToString("N")
                 };
 
                 var createResult = await _userManager.CreateAsync(user);
@@ -117,7 +123,7 @@ public sealed class ExternalAuthService : IExternalAuthService
 
         if (!user.IsActive || user.IsBanned)
         {
-            await _securityEventService.LogAsync(ESecurityEventType.FailedAttempt, user, client, null, null);
+            await _securityEventService.LogAsync(ESecurityEventType.FailedAttempt, user.ToDomainUser(), client, null, null);
             return Result<ExternalCallbackResponse>.Failure("InvalidCredentials");
         }
 
@@ -132,7 +138,7 @@ public sealed class ExternalAuthService : IExternalAuthService
         if (userClient.Status == EUserClientStatus.Revoked) return Result<ExternalCallbackResponse>.Failure("AccessRevoked");
 
         var code = _tokenService.GenerateAuthCode(user.Id.ToString(), client.ClientId.ToString(), request.RedirectUri);
-        await _securityEventService.LogAsync(ESecurityEventType.Login, user, client, null, null);
+        await _securityEventService.LogAsync(ESecurityEventType.Login, user.ToDomainUser(), client, null, null);
 
         return Result<ExternalCallbackResponse>.Success(new ExternalCallbackResponse(code));
     }

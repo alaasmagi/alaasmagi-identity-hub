@@ -55,6 +55,18 @@ public class AppUserClientRepository : BaseRepository<AppUserClient, AppUserClie
     public async Task<AppUserClient> AddUserClientAsync(AppUserClient userClient)
     {
         var entity = _mapper.Map(userClient)!;
+        if (entity.Id == Guid.Empty)
+        {
+            entity.Id = Guid.NewGuid();
+        }
+
+        var actor = userClient.GrantedBy ?? userClient.UserId.ToString();
+        entity.CreatedBy = actor;
+        entity.CreatedAt = DateTime.UtcNow;
+        entity.UpdatedBy = actor;
+        entity.UpdatedAt = DateTime.UtcNow;
+        entity.ConcurrencyToken = Guid.NewGuid().ToString("N");
+
         _context.AppUserClients.Add(entity);
         await _context.SaveChangesAsync();
 
@@ -79,6 +91,8 @@ public class AppUserClientRepository : BaseRepository<AppUserClient, AppUserClie
         entity.RevokeReason = userClient.RevokeReason;
         entity.ConsentGivenAt = userClient.ConsentGivenAt;
         entity.ConsentIp = userClient.ConsentIp;
+        entity.UpdatedBy = userClient.GrantedBy ?? userClient.UserId.ToString();
+        entity.UpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
     }

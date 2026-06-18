@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Web.Areas.Identity.Pages.Account;
 
-[Authorize]
+[Authorize(AuthenticationSchemes = "Identity.Application")]
 public class ConsentModel : PageModel
 {
     private readonly IConsentService _consentService;

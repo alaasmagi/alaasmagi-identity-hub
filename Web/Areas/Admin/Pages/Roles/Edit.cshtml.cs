@@ -60,6 +60,8 @@ public class EditModel : PageModel
         role.Name = Input.Name;
         role.NormalizedName = Input.Name.ToUpperInvariant();
         role.ClientId = Input.ClientId;
+        role.UpdatedBy = User.Identity?.Name ?? "admin";
+        role.UpdatedAt = DateTime.UtcNow;
         await _context.SaveChangesAsync();
         return RedirectToPage("./Index");
     }

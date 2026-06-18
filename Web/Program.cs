@@ -1,11 +1,13 @@
 using System.Reflection;
 using System.Text;
 using Application;
+using Application.Common.Abstractions;
 using Contracts.DataAccess;
 using DataAccess.Context;
 using DataAccess.Repository;
 using DTO.DataAccess.DTO;
 using DTO.DataAccess.Mapper;
+using Web.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -32,7 +34,14 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<AppUserEntity>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddRoles<AppRoleEntity>()
     .AddEntityFrameworkStores<AppDbContext>();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Identity/Account/Login";
+    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+});
 
 builder.Services.AddApplication();
 builder.Services.AddScoped<AppUserEntityMapper>();
@@ -45,6 +54,12 @@ builder.Services.AddScoped<IAppRoleRepository, AppRoleRepository>();
 builder.Services.AddScoped<IAppUserClientRepository, AppUserClientRepository>();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<ISecurityEventRepository, SecurityEventRepository>();
+builder.Services.AddScoped<IEmailService, LoggingEmailService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<ISecurityEventService, SecurityEventService>();
+builder.Services.AddScoped<MainClientResolver>();
+builder.Services.AddScoped<BootstrapAdminService>();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages(options =>
@@ -55,7 +70,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddAuthorizationBuilder()
     .AddPolicy("AdminArea", policy =>
     {
-        policy.AuthenticationSchemes.Add(CookieAuthenticationDefaults.AuthenticationScheme);
+        policy.AuthenticationSchemes.Add(IdentityConstants.ApplicationScheme);
         policy.RequireRole("Admin");
     });
 

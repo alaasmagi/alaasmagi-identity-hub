@@ -51,14 +51,21 @@ public class CreateModel : PageModel
         }
 
         var secret = GenerateSecret();
+        var clientId = Guid.NewGuid();
         var client = new ClientEntity
         {
+            Id = clientId,
             Name = Input.Name,
-            ClientId = Guid.NewGuid(),
+            ClientId = clientId,
             ClientSecretHash = new PasswordHasher<ClientEntity>().HashPassword(null!, secret),
             AllowedOrigins = Input.AllowedOrigins,
             IsActive = Input.IsActive,
-            RegistrationType = Input.RegistrationType
+            RegistrationType = Input.RegistrationType,
+            CreatedBy = User.Identity?.Name ?? "admin",
+            CreatedAt = DateTime.UtcNow,
+            UpdatedBy = User.Identity?.Name ?? "admin",
+            UpdatedAt = DateTime.UtcNow,
+            ConcurrencyToken = Guid.NewGuid().ToString("N")
         };
 
         _context.Clients.Add(client);

@@ -95,6 +95,8 @@ public static class AccountFlow
         {
             "AwaitingApproval" => "Your access is waiting for administrator approval.",
             "AccessRevoked" => "Your access to this application has been revoked.",
+            "EmailNotConfirmed" => "Confirm your email address before signing in.",
+            "InvalidClient" => "Open sign-in from a registered client application.",
             "InvalidCredentials" => "Invalid login attempt.",
             "InvalidRedirectUri" => "The return address is not valid for this application.",
             "NotInvited" => "You are not invited to access this application.",

@@ -5,6 +5,7 @@ using Application.Common.Abstractions;
 using Application.Common.Auth;
 using Application.Common.Validation;
 using Domain;
+using DTO.DataAccess.DTO;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 
@@ -12,8 +13,8 @@ namespace Application.Auth;
 
 public sealed class AuthService : IAuthService
 {
-    private readonly UserManager<AppUser> _userManager;
-    private readonly SignInManager<AppUser> _signInManager;
+    private readonly UserManager<AppUserEntity> _userManager;
+    private readonly SignInManager<AppUserEntity> _signInManager;
     private readonly IEmailService _emailService;
     private readonly ISecurityEventService _securityEventService;
     private readonly AuthWorkflow _authWorkflow;
@@ -27,8 +28,8 @@ public sealed class AuthService : IAuthService
     private readonly IValidator<ChangePasswordRequest> _changePasswordValidator;
 
     public AuthService(
-        UserManager<AppUser> userManager,
-        SignInManager<AppUser> signInManager,
+        UserManager<AppUserEntity> userManager,
+        SignInManager<AppUserEntity> signInManager,
         IEmailService emailService,
         ISecurityEventService securityEventService,
         AuthWorkflow authWorkflow,
@@ -61,12 +62,17 @@ public sealed class AuthService : IAuthService
         var validation = await _registerValidator.ValidateAsync(request);
         if (!validation.IsValid) return Result<RegisterResponse>.Failure(validation.ToErrorMessage());
 
-        var user = new AppUser
+        var user = new AppUserEntity
         {
             Email = request.Email,
             UserName = request.Email,
             FullName = request.FullName,
-            IsActive = true
+            IsActive = true,
+            CreatedBy = request.Email,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedBy = request.Email,
+            UpdatedAt = DateTime.UtcNow,
+            ConcurrencyToken = Guid.NewGuid().ToString("N")
         };
 
         var result = await _userManager.CreateAsync(user, request.Password);
@@ -76,8 +82,8 @@ public sealed class AuthService : IAuthService
         }
 
         var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-        await _emailService.SendEmailConfirmationAsync(user, token);
-        await _securityEventService.LogAsync(ESecurityEventType.Login, user, null, null, null);
+        await _emailService.SendEmailConfirmationAsync(user.ToDomainUser(), token);
+        await _securityEventService.LogAsync(ESecurityEventType.Login, user.ToDomainUser(), null, null, null);
 
         return Result<RegisterResponse>.Success(new RegisterResponse(user.Id));
     }
@@ -98,14 +104,19 @@ public sealed class AuthService : IAuthService
 
         if (!user.IsActive || user.IsBanned)
         {
-            await _securityEventService.LogAsync(ESecurityEventType.FailedAttempt, user, client, null, null);
+            await _securityEventService.LogAsync(ESecurityEventType.FailedAttempt, user.ToDomainUser(), client, null, null);
             return Result<LoginResponse>.Failure("InvalidCredentials");
         }
 
         var signInResult = await _signInManager.CheckPasswordSignInAsync(user, request.Password, lockoutOnFailure: true);
+        if (signInResult.IsNotAllowed)
+        {
+            return Result<LoginResponse>.Failure("EmailNotConfirmed");
+        }
+
         if (!signInResult.Succeeded)
         {
-            await _securityEventService.LogAsync(ESecurityEventType.FailedAttempt, user, client, null, null);
+            await _securityEventService.LogAsync(ESecurityEventType.FailedAttempt, user.ToDomainUser(), client, null, null);
             return Result<LoginResponse>.Failure("InvalidCredentials");
         }
 
@@ -127,7 +138,7 @@ public sealed class AuthService : IAuthService
         var response = await _authWorkflow.ContinueAfterAuthenticationAsync(user, client, request.ResponseType, request.RedirectUri);
         if (response.Error is not null) return Result<LoginResponse>.Failure(response.Error);
 
-        await _securityEventService.LogAsync(ESecurityEventType.Login, user, client, null, null);
+        await _securityEventService.LogAsync(ESecurityEventType.Login, user.ToDomainUser(), client, null, null);
         return Result<LoginResponse>.Success(response);
     }
 
@@ -160,7 +171,7 @@ public sealed class AuthService : IAuthService
             return Result<TokenResponse>.Failure(response.Error ?? "AccessNotActive");
         }
 
-        await _securityEventService.LogAsync(ESecurityEventType.TokenRefresh, user, client, null, null);
+        await _securityEventService.LogAsync(ESecurityEventType.TokenRefresh, user.ToDomainUser(), client, null, null);
         return Result<TokenResponse>.Success(new TokenResponse(response.AccessToken, response.RefreshToken));
     }
 
@@ -178,7 +189,7 @@ public sealed class AuthService : IAuthService
 
         await _authWorkflow.RevokeRefreshTokenAsync(user, payload.ClientId);
         var client = await _authWorkflow.GetActiveClientAsync(payload.ClientId);
-        await _securityEventService.LogAsync(ESecurityEventType.Logout, user, client, null, null);
+        await _securityEventService.LogAsync(ESecurityEventType.Logout, user.ToDomainUser(), client, null, null);
         return Result<Unit>.Success(Unit.Value);
     }
 
@@ -203,7 +214,7 @@ public sealed class AuthService : IAuthService
         if (user is not null)
         {
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-            await _emailService.SendPasswordResetAsync(user, token);
+            await _emailService.SendPasswordResetAsync(user.ToDomainUser(), token);
         }
 
         return Result<Unit>.Success(Unit.Value);
@@ -232,7 +243,7 @@ public sealed class AuthService : IAuthService
         var result = await _userManager.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);
         if (!result.Succeeded) return Result<Unit>.Failure("PasswordChangeFailed");
 
-        await _securityEventService.LogAsync(ESecurityEventType.PasswordChanged, user, null, null, null);
+        await _securityEventService.LogAsync(ESecurityEventType.PasswordChanged, user.ToDomainUser(), null, null, null);
         return Result<Unit>.Success(Unit.Value);
     }
 }

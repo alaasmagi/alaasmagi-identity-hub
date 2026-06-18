@@ -3,10 +3,12 @@ using Application.Auth;
 using Application.Auth.Requests;
 using Application.ExternalAuth;
 using Contracts.DataAccess;
+using DTO.DataAccess.DTO;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Web.Services;
 
 namespace Web.Areas.Identity.Pages.Account;
 
@@ -15,15 +17,24 @@ public class LoginModel : PageModel
     private readonly IAuthService _authService;
     private readonly IExternalAuthService _externalAuthService;
     private readonly IClientRepository _clientRepository;
+    private readonly SignInManager<AppUserEntity> _signInManager;
+    private readonly UserManager<AppUserEntity> _userManager;
+    private readonly BootstrapAdminService _bootstrapAdminService;
 
     public LoginModel(
         IAuthService authService,
         IExternalAuthService externalAuthService,
-        IClientRepository clientRepository)
+        IClientRepository clientRepository,
+        SignInManager<AppUserEntity> signInManager,
+        UserManager<AppUserEntity> userManager,
+        BootstrapAdminService bootstrapAdminService)
     {
         _authService = authService;
         _externalAuthService = externalAuthService;
         _clientRepository = clientRepository;
+        _signInManager = signInManager;
+        _userManager = userManager;
+        _bootstrapAdminService = bootstrapAdminService;
     }
 
     [BindProperty]
@@ -42,6 +53,7 @@ public class LoginModel : PageModel
     public string? ErrorMessage { get; set; }
 
     public string? ClientName { get; private set; }
+    public bool MissingClientContext { get; private set; }
     public IReadOnlyList<string> ExternalProviders { get; private set; } = [];
 
     public sealed class InputModel
@@ -78,22 +90,57 @@ public class LoginModel : PageModel
             return Page();
         }
 
-        var result = await _authService.LoginAsync(
-            new LoginRequest(Input.Email, Input.Password, ClientId, "cookie", RedirectUri));
+        if (ClientId != Guid.Empty)
+        {
+            var clientFlowUser = await _userManager.FindByEmailAsync(Input.Email);
+            if (clientFlowUser is not null)
+            {
+                await _bootstrapAdminService.EnsureBootstrapAdminAsync(clientFlowUser);
+            }
 
-        return AccountFlow.HandleLoginResult(this, result, ClientId, RedirectUri);
+            var result = await _authService.LoginAsync(
+                new LoginRequest(Input.Email, Input.Password, ClientId, "cookie", RedirectUri));
+
+            return AccountFlow.HandleLoginResult(this, result, ClientId, RedirectUri);
+        }
+
+        var user = await _userManager.FindByEmailAsync(Input.Email);
+        if (user is null)
+        {
+            ModelState.AddModelError(string.Empty, AccountFlow.ToDisplayError("InvalidCredentials"));
+            return Page();
+        }
+
+        var signInResult = await _signInManager.CheckPasswordSignInAsync(user, Input.Password, lockoutOnFailure: true);
+        if (signInResult.Succeeded)
+        {
+            await _bootstrapAdminService.EnsureBootstrapAdminAsync(user);
+            await _signInManager.SignInAsync(user, Input.RememberMe);
+            return LocalRedirect(ReturnUrl ?? "/Admin/Users");
+        }
+
+        if (signInResult.IsNotAllowed)
+        {
+            ModelState.AddModelError(string.Empty, AccountFlow.ToDisplayError("EmailNotConfirmed"));
+            return Page();
+        }
+
+        ModelState.AddModelError(string.Empty, AccountFlow.ToDisplayError("InvalidCredentials"));
+        return Page();
     }
 
     private async Task LoadClientContextAsync()
     {
         if (ClientId == Guid.Empty)
         {
+            MissingClientContext = true;
             ExternalProviders = [];
             return;
         }
 
         var client = await _clientRepository.GetByClientIdAsync(ClientId);
         ClientName = client?.Name;
+        MissingClientContext = client is null;
 
         var providers = await _externalAuthService.GetProvidersAsync(ClientId);
         ExternalProviders = providers.IsSuccess && providers.Value is not null

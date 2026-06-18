@@ -7,6 +7,7 @@ using Application.Common.Validation;
 using Application.TwoFactor.Requests;
 using Application.TwoFactor.Responses;
 using Domain;
+using DTO.DataAccess.DTO;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 
@@ -16,8 +17,8 @@ public sealed class TwoFactorService : ITwoFactorService
 {
     private const int RecoveryCodeCount = 10;
 
-    private readonly UserManager<AppUser> _userManager;
-    private readonly SignInManager<AppUser> _signInManager;
+    private readonly UserManager<AppUserEntity> _userManager;
+    private readonly SignInManager<AppUserEntity> _signInManager;
     private readonly ISecurityEventService _securityEventService;
     private readonly AuthWorkflow _authWorkflow;
     private readonly IValidator<EnableTwoFactorRequest> _enableValidator;
@@ -27,8 +28,8 @@ public sealed class TwoFactorService : ITwoFactorService
     private readonly IValidator<RecoveryLoginRequest> _recoveryLoginValidator;
 
     public TwoFactorService(
-        UserManager<AppUser> userManager,
-        SignInManager<AppUser> signInManager,
+        UserManager<AppUserEntity> userManager,
+        SignInManager<AppUserEntity> signInManager,
         ISecurityEventService securityEventService,
         AuthWorkflow authWorkflow,
         IValidator<EnableTwoFactorRequest> enableValidator,
@@ -92,7 +93,7 @@ public sealed class TwoFactorService : ITwoFactorService
 
         await _userManager.SetTwoFactorEnabledAsync(user, true);
         var codes = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, RecoveryCodeCount);
-        await _securityEventService.LogAsync(ESecurityEventType.TwoFactorEnabled, user, null, null, null);
+        await _securityEventService.LogAsync(ESecurityEventType.TwoFactorEnabled, user.ToDomainUser(), null, null, null);
 
         return Result<RecoveryCodesResponse>.Success(new RecoveryCodesResponse(codes?.ToList() ?? []));
     }
@@ -111,7 +112,7 @@ public sealed class TwoFactorService : ITwoFactorService
         }
 
         await _userManager.SetTwoFactorEnabledAsync(user, false);
-        await _securityEventService.LogAsync(ESecurityEventType.TwoFactorDisabled, user, null, null, null);
+        await _securityEventService.LogAsync(ESecurityEventType.TwoFactorDisabled, user.ToDomainUser(), null, null, null);
 
         return Result<Unit>.Success(Unit.Value);
     }
@@ -191,13 +192,13 @@ public sealed class TwoFactorService : ITwoFactorService
             : Result<LoginResponse>.Failure(response.Error);
     }
 
-    private Task<bool> VerifyAuthenticatorCodeAsync(AppUser user, string code)
+    private Task<bool> VerifyAuthenticatorCodeAsync(AppUserEntity user, string code)
     {
         var normalized = code.Replace(" ", string.Empty).Replace("-", string.Empty);
         return _userManager.VerifyTwoFactorTokenAsync(user, TokenOptions.DefaultAuthenticatorProvider, normalized);
     }
 
-    private async Task<(AppUser User, Domain.Client Client, string ResponseType, string? RedirectUri)?> GetTempLoginContextAsync(string tempToken)
+    private async Task<(AppUserEntity User, Domain.Client Client, string ResponseType, string? RedirectUri)?> GetTempLoginContextAsync(string tempToken)
     {
         var payload = await _authWorkflow.ValidateTempTokenAsync(tempToken);
         if (payload is null) return null;

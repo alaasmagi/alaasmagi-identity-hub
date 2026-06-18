@@ -71,6 +71,8 @@ public class EditModel : PageModel
         client.AllowedOrigins = Input.AllowedOrigins;
         client.IsActive = Input.IsActive;
         client.RegistrationType = Input.RegistrationType;
+        client.UpdatedBy = User.Identity?.Name ?? "admin";
+        client.UpdatedAt = DateTime.UtcNow;
         await _context.SaveChangesAsync();
         return RedirectToPage("./Index");
     }
@@ -83,6 +85,8 @@ public class EditModel : PageModel
 
         var secret = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
         client.ClientSecretHash = new PasswordHasher<ClientEntity>().HashPassword(client, secret);
+        client.UpdatedBy = User.Identity?.Name ?? "admin";
+        client.UpdatedAt = DateTime.UtcNow;
         await _context.SaveChangesAsync();
 
         Input = new InputModel

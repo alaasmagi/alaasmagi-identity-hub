@@ -3,6 +3,7 @@ using Application.Auth.Responses;
 using Application.Common.Abstractions;
 using Contracts.DataAccess;
 using Domain;
+using DTO.DataAccess.DTO;
 using Microsoft.AspNetCore.Identity;
 
 namespace Application.Common.Auth;
@@ -11,14 +12,14 @@ public sealed class AuthWorkflow
 {
     private const string DefaultRoleName = "DEFAULT";
 
-    private readonly UserManager<AppUser> _userManager;
+    private readonly UserManager<AppUserEntity> _userManager;
     private readonly IClientRepository _clientRepository;
     private readonly IAppUserClientRepository _userClientRepository;
     private readonly IAppRoleRepository _roleRepository;
     private readonly ITokenService _tokenService;
 
     public AuthWorkflow(
-        UserManager<AppUser> userManager,
+        UserManager<AppUserEntity> userManager,
         IClientRepository clientRepository,
         IAppUserClientRepository userClientRepository,
         IAppRoleRepository roleRepository,
@@ -38,7 +39,7 @@ public sealed class AuthWorkflow
     }
 
     public async Task<LoginResponse> ContinueAfterAuthenticationAsync(
-        AppUser user,
+        AppUserEntity user,
         Client client,
         string responseType,
         string? redirectUri = null)
@@ -65,7 +66,7 @@ public sealed class AuthWorkflow
     }
 
     public async Task<LoginResponse> IssueLoginResponseAsync(
-        AppUser user,
+        AppUserEntity user,
         Client client,
         string responseType = "jwt",
         string? redirectUri = null)
@@ -84,7 +85,7 @@ public sealed class AuthWorkflow
         }
 
         var roles = await GetClientRolesAsync(user, client);
-        var accessToken = _tokenService.GenerateAccessToken(user, client, roles);
+        var accessToken = _tokenService.GenerateAccessToken(user.ToDomainUser(), client, roles);
         var refreshToken = await CreateRefreshTokenAsync(user, client);
 
         return new LoginResponse
@@ -94,7 +95,7 @@ public sealed class AuthWorkflow
         };
     }
 
-    public async Task<IList<string>> GetClientRolesAsync(AppUser user, Client client)
+    public async Task<IList<string>> GetClientRolesAsync(AppUserEntity user, Client client)
     {
         var userRoles = await _userManager.GetRolesAsync(user);
         var clientRoles = await _roleRepository.GetByClientIdAsync(client.ClientId);
@@ -108,7 +109,7 @@ public sealed class AuthWorkflow
             .ToList();
     }
 
-    public async Task<IReadOnlyList<ClaimDto>> BuildRuntimeClaimsAsync(AppUser user, Client client)
+    public async Task<IReadOnlyList<ClaimDto>> BuildRuntimeClaimsAsync(AppUserEntity user, Client client)
     {
         var roles = await GetClientRolesAsync(user, client);
         var claims = new List<ClaimDto>
@@ -124,7 +125,7 @@ public sealed class AuthWorkflow
         return claims;
     }
 
-    public async Task<string> CreateRefreshTokenAsync(AppUser user, Client client)
+    public async Task<string> CreateRefreshTokenAsync(AppUserEntity user, Client client)
     {
         var payload = new RefreshTokenPayload(user.Id, client.ClientId, _tokenService.GenerateRefreshToken());
         var token = TokenPayloads.Protect(payload);
@@ -132,18 +133,18 @@ public sealed class AuthWorkflow
         return token;
     }
 
-    public async Task<bool> ValidateRefreshTokenAsync(AppUser user, Guid clientId, string refreshToken)
+    public async Task<bool> ValidateRefreshTokenAsync(AppUserEntity user, Guid clientId, string refreshToken)
     {
         var stored = await _userManager.GetAuthenticationTokenAsync(user, ApplicationTokenOptions.Provider, RefreshTokenName(clientId));
         return string.Equals(stored, refreshToken, StringComparison.Ordinal);
     }
 
-    public Task RevokeRefreshTokenAsync(AppUser user, Guid clientId)
+    public Task RevokeRefreshTokenAsync(AppUserEntity user, Guid clientId)
     {
         return _userManager.RemoveAuthenticationTokenAsync(user, ApplicationTokenOptions.Provider, RefreshTokenName(clientId));
     }
 
-    public async Task RevokeAllRefreshTokensAsync(AppUser user)
+    public async Task RevokeAllRefreshTokensAsync(AppUserEntity user)
     {
         var clients = await _clientRepository.GetAllClientsAsync();
         foreach (var client in clients)
@@ -152,7 +153,7 @@ public sealed class AuthWorkflow
         }
     }
 
-    public async Task<string> CreateTempTokenAsync(AppUser user, Client client, string responseType, string? redirectUri = null)
+    public async Task<string> CreateTempTokenAsync(AppUserEntity user, Client client, string responseType, string? redirectUri = null)
     {
         var payload = new TempTokenPayload(
             user.Id,
@@ -185,12 +186,12 @@ public sealed class AuthWorkflow
         return string.Equals(stored, token, StringComparison.Ordinal) ? payload : null;
     }
 
-    public Task ClearTempTokenAsync(AppUser user, Guid clientId)
+    public Task ClearTempTokenAsync(AppUserEntity user, Guid clientId)
     {
         return _userManager.RemoveAuthenticationTokenAsync(user, ApplicationTokenOptions.Provider, TempTokenName(clientId));
     }
 
-    public async Task<string> CreateConsentTokenAsync(AppUser user, Client client, string responseType, string? redirectUri = null)
+    public async Task<string> CreateConsentTokenAsync(AppUserEntity user, Client client, string responseType, string? redirectUri = null)
     {
         var payload = new ConsentTokenPayload(
             user.Id,
@@ -223,12 +224,12 @@ public sealed class AuthWorkflow
         return string.Equals(stored, token, StringComparison.Ordinal) ? payload : null;
     }
 
-    public Task ClearConsentTokenAsync(AppUser user, Guid clientId)
+    public Task ClearConsentTokenAsync(AppUserEntity user, Guid clientId)
     {
         return _userManager.RemoveAuthenticationTokenAsync(user, ApplicationTokenOptions.Provider, ConsentTokenName(clientId));
     }
 
-    public async Task AssignDefaultRoleIfPresentAsync(AppUser user, Client client)
+    public async Task AssignDefaultRoleIfPresentAsync(AppUserEntity user, Client client)
     {
         var role = await _roleRepository.GetByNameAndClientIdAsync(DefaultRoleName, client.ClientId);
         if (!string.IsNullOrWhiteSpace(role?.Name) && !await _userManager.IsInRoleAsync(user, role.Name))

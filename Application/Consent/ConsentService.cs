@@ -6,6 +6,7 @@ using Application.Consent.Requests;
 using Application.Consent.Responses;
 using Contracts.DataAccess;
 using Domain;
+using DTO.DataAccess.DTO;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 
@@ -13,7 +14,7 @@ namespace Application.Consent;
 
 public sealed class ConsentService : IConsentService
 {
-    private readonly UserManager<AppUser> _userManager;
+    private readonly UserManager<AppUserEntity> _userManager;
     private readonly IAppUserClientRepository _userClientRepository;
     private readonly ISecurityEventService _securityEventService;
     private readonly AuthWorkflow _authWorkflow;
@@ -21,7 +22,7 @@ public sealed class ConsentService : IConsentService
     private readonly IValidator<RevokeConsentRequest> _revokeConsentValidator;
 
     public ConsentService(
-        UserManager<AppUser> userManager,
+        UserManager<AppUserEntity> userManager,
         IAppUserClientRepository userClientRepository,
         ISecurityEventService securityEventService,
         AuthWorkflow authWorkflow,
@@ -119,7 +120,7 @@ public sealed class ConsentService : IConsentService
         }
 
         await _authWorkflow.ClearConsentTokenAsync(user, client.ClientId);
-        await _securityEventService.LogAsync(ESecurityEventType.ConsentGiven, user, client, request.IpAddress, null);
+        await _securityEventService.LogAsync(ESecurityEventType.ConsentGiven, user.ToDomainUser(), client, request.IpAddress, null);
 
         if (status == EUserClientStatus.Pending)
         {
@@ -158,7 +159,7 @@ public sealed class ConsentService : IConsentService
 
         await _userClientRepository.UpdateUserClientAsync(userClient);
         await _authWorkflow.RevokeRefreshTokenAsync(user, client.ClientId);
-        await _securityEventService.LogAsync(ESecurityEventType.ConsentRevoked, user, client, null, null);
+        await _securityEventService.LogAsync(ESecurityEventType.ConsentRevoked, user.ToDomainUser(), client, null, null);
 
         return Result<Unit>.Success(Unit.Value);
     }
