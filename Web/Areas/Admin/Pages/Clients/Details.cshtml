@@ -1,0 +1,23 @@
+@page
+@model Web.Areas.Admin.Pages.Clients.DetailsModel
+@{
+    ViewData["Title"] = "Client Details";
+}
+
+<h1>Client Details</h1>
+
+<dl class="row">
+    <dt class="col-sm-3">Name</dt>
+    <dd class="col-sm-9">@Model.ClientEntity.Name</dd>
+    <dt class="col-sm-3">Client ID</dt>
+    <dd class="col-sm-9">@Model.ClientEntity.ClientId</dd>
+    <dt class="col-sm-3">Allowed Origins</dt>
+    <dd class="col-sm-9">@Model.ClientEntity.AllowedOrigins</dd>
+    <dt class="col-sm-3">Active</dt>
+    <dd class="col-sm-9">@Model.ClientEntity.IsActive</dd>
+    <dt class="col-sm-3">Registration Type</dt>
+    <dd class="col-sm-9">@Model.ClientEntity.RegistrationType</dd>
+</dl>
+
+<a asp-page="./Edit" asp-route-id="@Model.ClientEntity.Id">Edit</a> |
+<a asp-page="./Index">Back to List</a>

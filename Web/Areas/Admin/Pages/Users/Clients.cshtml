@@ -1,0 +1,41 @@
+@page
+@using Domain
+@model Web.Areas.Admin.Pages.Users.ClientsModel
+@{
+    ViewData["Title"] = "User Clients";
+}
+
+<h1>User Clients</h1>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>Client</th>
+        <th>Status</th>
+        <th>Granted at</th>
+        <th>Revoked at</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model.UserClients)
+    {
+        <tr>
+            <td>@(item.Client?.Name ?? item.ClientId.ToString())</td>
+            <td>@item.Status</td>
+            <td>@item.GrantedAt</td>
+            <td>@item.RevokedAt</td>
+            <td class="text-end">
+                @if (item.Status == EUserClientStatus.Pending)
+                {
+                    <form method="post" asp-page-handler="Approve" asp-route-clientId="@item.ClientId" class="d-inline">
+                        <button type="submit" class="btn btn-sm btn-primary">Approve</button>
+                    </form>
+                }
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<a asp-page="./Index">Back to users</a>

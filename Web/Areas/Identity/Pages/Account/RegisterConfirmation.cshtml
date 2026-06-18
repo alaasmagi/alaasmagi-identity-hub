@@ -1,0 +1,17 @@
+﻿@page
+@model RegisterConfirmationModel
+@{
+    ViewData["Title"] = "Register confirmation";
+}
+
+<h1>@ViewData["Title"]</h1>
+<p>
+    Please check your email to confirm your account.
+</p>
+<p>
+    <a asp-page="./Login"
+       asp-route-clientId="@Model.ClientId"
+       asp-route-redirectUri="@Model.RedirectUri"
+       asp-route-returnUrl="@Model.ReturnUrl">Back to sign in</a>
+</p>
+

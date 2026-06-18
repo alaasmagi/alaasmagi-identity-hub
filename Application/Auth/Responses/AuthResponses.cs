@@ -22,6 +22,11 @@ public sealed class LoginResponse
     public string? RefreshToken { get; init; }
 
     /// <summary>
+    /// Gets the issued auth code when a cookie/federated response is requested.
+    /// </summary>
+    public string? AuthCode { get; init; }
+
+    /// <summary>
     /// Gets a value indicating whether two-factor authentication is required.
     /// </summary>
     public bool RequiresTwoFactor { get; init; }

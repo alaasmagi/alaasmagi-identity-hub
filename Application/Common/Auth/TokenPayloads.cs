@@ -4,8 +4,8 @@ using System.Text.Json;
 namespace Application.Common.Auth;
 
 public sealed record RefreshTokenPayload(Guid UserId, Guid ClientId, string Value);
-public sealed record TempTokenPayload(Guid UserId, Guid ClientId, string ResponseType, string Value, DateTime ExpiresAtUtc);
-public sealed record ConsentTokenPayload(Guid UserId, Guid ClientId, string ResponseType, string Value, DateTime ExpiresAtUtc);
+public sealed record TempTokenPayload(Guid UserId, Guid ClientId, string ResponseType, string Value, DateTime ExpiresAtUtc, string? RedirectUri = null);
+public sealed record ConsentTokenPayload(Guid UserId, Guid ClientId, string ResponseType, string Value, DateTime ExpiresAtUtc, string? RedirectUri = null);
 
 public static class TokenPayloads
 {

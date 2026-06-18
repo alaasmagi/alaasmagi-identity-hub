@@ -15,7 +15,8 @@ public sealed record RegisterRequest(string Email, string Password, string FullN
 /// <param name="Password">The user's password.</param>
 /// <param name="ClientId">The target client identifier.</param>
 /// <param name="ResponseType">The requested response type.</param>
-public sealed record LoginRequest(string Email, string Password, Guid ClientId, string ResponseType);
+/// <param name="RedirectUri">The redirect URI used when requesting a cookie/federated auth-code response.</param>
+public sealed record LoginRequest(string Email, string Password, Guid ClientId, string ResponseType, string? RedirectUri = null);
 
 /// <summary>
 /// Request to rotate a refresh token.

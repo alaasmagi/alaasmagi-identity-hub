@@ -1,0 +1,27 @@
+@page
+@model Web.Areas.Admin.Pages.Users.BanModel
+@{
+    ViewData["Title"] = Model.IsBanned ? "Unban user" : "Ban user";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form method="post">
+    <input type="hidden" asp-for="UserId" />
+    <input type="hidden" asp-for="IsBanned" />
+    <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+    @if (!Model.IsBanned)
+    {
+        <div class="form-floating mb-3">
+            <input asp-for="Reason" class="form-control" placeholder="Reason" />
+            <label asp-for="Reason" class="form-label"></label>
+            <span asp-validation-for="Reason" class="text-danger"></span>
+        </div>
+    }
+    <button type="submit" class="btn btn-primary">Confirm</button>
+    <a asp-page="./Index" class="btn btn-outline-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,41 @@
+@page
+@model ConsentModel
+@{
+    ViewData["Title"] = "Authorize application";
+}
+
+<h1>@ViewData["Title"]</h1>
+<div class="row">
+    <div class="col-md-6">
+        <section>
+            <form method="post">
+                <h2>@(Model.ClientName ?? "This application") would like to access your account.</h2>
+                <hr />
+                <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                <input type="hidden" asp-for="ClientId" />
+                <input type="hidden" asp-for="RedirectUri" />
+                <input type="hidden" asp-for="ConsentToken" />
+
+                @if (!string.IsNullOrWhiteSpace(Model.Message))
+                {
+                    <div class="alert alert-info" role="status">@Model.Message</div>
+                }
+                else
+                {
+                    @if (Model.RegistrationType is not null)
+                    {
+                        <p class="text-muted">Registration type: @Model.RegistrationType</p>
+                    }
+                    <div class="d-flex gap-2">
+                        <button type="submit" asp-page-handler="Approve" class="btn btn-primary">Approve</button>
+                        <button type="submit" asp-page-handler="Deny" class="btn btn-outline-secondary">Deny</button>
+                    </div>
+                }
+            </form>
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

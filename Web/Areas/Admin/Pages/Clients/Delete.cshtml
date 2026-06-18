@@ -1,0 +1,23 @@
+@page
+@model Web.Areas.Admin.Pages.Clients.DeleteModel
+@{
+    ViewData["Title"] = "Delete Client";
+}
+
+<h1>Delete Client</h1>
+
+<h3>Are you sure you want to delete this client?</h3>
+<dl class="row">
+    <dt class="col-sm-3">Name</dt>
+    <dd class="col-sm-9">@Model.ClientEntity.Name</dd>
+    <dt class="col-sm-3">Client ID</dt>
+    <dd class="col-sm-9">@Model.ClientEntity.ClientId</dd>
+    <dt class="col-sm-3">Registration Type</dt>
+    <dd class="col-sm-9">@Model.ClientEntity.RegistrationType</dd>
+</dl>
+
+<form method="post">
+    <input type="hidden" asp-for="ClientEntity.Id" />
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a asp-page="./Index" class="btn btn-outline-secondary">Back</a>
+</form>

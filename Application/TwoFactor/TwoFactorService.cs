@@ -17,6 +17,7 @@ public sealed class TwoFactorService : ITwoFactorService
     private const int RecoveryCodeCount = 10;
 
     private readonly UserManager<AppUser> _userManager;
+    private readonly SignInManager<AppUser> _signInManager;
     private readonly ISecurityEventService _securityEventService;
     private readonly AuthWorkflow _authWorkflow;
     private readonly IValidator<EnableTwoFactorRequest> _enableValidator;
@@ -27,6 +28,7 @@ public sealed class TwoFactorService : ITwoFactorService
 
     public TwoFactorService(
         UserManager<AppUser> userManager,
+        SignInManager<AppUser> signInManager,
         ISecurityEventService securityEventService,
         AuthWorkflow authWorkflow,
         IValidator<EnableTwoFactorRequest> enableValidator,
@@ -36,6 +38,7 @@ public sealed class TwoFactorService : ITwoFactorService
         IValidator<RecoveryLoginRequest> recoveryLoginValidator)
     {
         _userManager = userManager;
+        _signInManager = signInManager;
         _securityEventService = securityEventService;
         _authWorkflow = authWorkflow;
         _enableValidator = enableValidator;
@@ -145,7 +148,16 @@ public sealed class TwoFactorService : ITwoFactorService
         }
 
         await _authWorkflow.ClearTempTokenAsync(loginContext.User, loginContext.Client.ClientId);
-        var response = await _authWorkflow.ContinueAfterAuthenticationAsync(loginContext.User, loginContext.Client, loginContext.ResponseType);
+        if (loginContext.ResponseType == "cookie")
+        {
+            await _signInManager.SignInAsync(loginContext.User, isPersistent: false);
+        }
+
+        var response = await _authWorkflow.ContinueAfterAuthenticationAsync(
+            loginContext.User,
+            loginContext.Client,
+            loginContext.ResponseType,
+            loginContext.RedirectUri);
         return response.Error is null
             ? Result<LoginResponse>.Success(response)
             : Result<LoginResponse>.Failure(response.Error);
@@ -164,7 +176,16 @@ public sealed class TwoFactorService : ITwoFactorService
         if (!result.Succeeded) return Result<LoginResponse>.Failure("InvalidRecoveryCode");
 
         await _authWorkflow.ClearTempTokenAsync(loginContext.User, loginContext.Client.ClientId);
-        var response = await _authWorkflow.ContinueAfterAuthenticationAsync(loginContext.User, loginContext.Client, loginContext.ResponseType);
+        if (loginContext.ResponseType == "cookie")
+        {
+            await _signInManager.SignInAsync(loginContext.User, isPersistent: false);
+        }
+
+        var response = await _authWorkflow.ContinueAfterAuthenticationAsync(
+            loginContext.User,
+            loginContext.Client,
+            loginContext.ResponseType,
+            loginContext.RedirectUri);
         return response.Error is null
             ? Result<LoginResponse>.Success(response)
             : Result<LoginResponse>.Failure(response.Error);
@@ -176,14 +197,14 @@ public sealed class TwoFactorService : ITwoFactorService
         return _userManager.VerifyTwoFactorTokenAsync(user, TokenOptions.DefaultAuthenticatorProvider, normalized);
     }
 
-    private async Task<(AppUser User, Domain.Client Client, string ResponseType)?> GetTempLoginContextAsync(string tempToken)
+    private async Task<(AppUser User, Domain.Client Client, string ResponseType, string? RedirectUri)?> GetTempLoginContextAsync(string tempToken)
     {
         var payload = await _authWorkflow.ValidateTempTokenAsync(tempToken);
         if (payload is null) return null;
 
         var user = await _userManager.FindByIdAsync(payload.UserId.ToString());
         var client = await _authWorkflow.GetActiveClientAsync(payload.ClientId);
-        return user is null || client is null ? null : (user, client, payload.ResponseType);
+        return user is null || client is null ? null : (user, client, payload.ResponseType, payload.RedirectUri);
     }
 
     private static string GenerateQrCodeUri(string email, string key)

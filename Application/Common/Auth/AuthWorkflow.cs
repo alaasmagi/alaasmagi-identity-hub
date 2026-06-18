@@ -37,13 +37,17 @@ public sealed class AuthWorkflow
         return client is { IsActive: true } ? client : null;
     }
 
-    public async Task<LoginResponse> ContinueAfterAuthenticationAsync(AppUser user, Client client, string responseType)
+    public async Task<LoginResponse> ContinueAfterAuthenticationAsync(
+        AppUser user,
+        Client client,
+        string responseType,
+        string? redirectUri = null)
     {
         var userClient = await _userClientRepository.GetByUserAndClientAsync(user.Id, client.ClientId);
 
         if (userClient is null)
         {
-            var consentToken = await CreateConsentTokenAsync(user, client, responseType);
+            var consentToken = await CreateConsentTokenAsync(user, client, responseType, redirectUri);
             return new LoginResponse
             {
                 RequiresConsent = true,
@@ -55,13 +59,30 @@ public sealed class AuthWorkflow
         {
             EUserClientStatus.Pending => new LoginResponse { Error = "AwaitingApproval" },
             EUserClientStatus.Revoked => new LoginResponse { Error = "AccessRevoked" },
-            EUserClientStatus.Active => await IssueLoginResponseAsync(user, client),
+            EUserClientStatus.Active => await IssueLoginResponseAsync(user, client, responseType, redirectUri),
             _ => new LoginResponse { Error = "InvalidUserClientStatus" }
         };
     }
 
-    public async Task<LoginResponse> IssueLoginResponseAsync(AppUser user, Client client)
+    public async Task<LoginResponse> IssueLoginResponseAsync(
+        AppUser user,
+        Client client,
+        string responseType = "jwt",
+        string? redirectUri = null)
     {
+        if (responseType == "cookie")
+        {
+            if (string.IsNullOrWhiteSpace(redirectUri) || !IsRedirectUriAllowed(client, redirectUri))
+            {
+                return new LoginResponse { Error = "InvalidRedirectUri" };
+            }
+
+            return new LoginResponse
+            {
+                AuthCode = _tokenService.GenerateAuthCode(user.Id.ToString(), client.ClientId.ToString(), redirectUri)
+            };
+        }
+
         var roles = await GetClientRolesAsync(user, client);
         var accessToken = _tokenService.GenerateAccessToken(user, client, roles);
         var refreshToken = await CreateRefreshTokenAsync(user, client);
@@ -131,14 +152,15 @@ public sealed class AuthWorkflow
         }
     }
 
-    public async Task<string> CreateTempTokenAsync(AppUser user, Client client, string responseType)
+    public async Task<string> CreateTempTokenAsync(AppUser user, Client client, string responseType, string? redirectUri = null)
     {
         var payload = new TempTokenPayload(
             user.Id,
             client.ClientId,
             responseType,
             Guid.NewGuid().ToString("N"),
-            DateTime.UtcNow.Add(ApplicationTokenOptions.TempTokenLifetime));
+            DateTime.UtcNow.Add(ApplicationTokenOptions.TempTokenLifetime),
+            redirectUri);
 
         var token = TokenPayloads.Protect(payload);
         await _userManager.SetAuthenticationTokenAsync(user, ApplicationTokenOptions.Provider, TempTokenName(client.ClientId), token);
@@ -168,14 +190,15 @@ public sealed class AuthWorkflow
         return _userManager.RemoveAuthenticationTokenAsync(user, ApplicationTokenOptions.Provider, TempTokenName(clientId));
     }
 
-    public async Task<string> CreateConsentTokenAsync(AppUser user, Client client, string responseType)
+    public async Task<string> CreateConsentTokenAsync(AppUser user, Client client, string responseType, string? redirectUri = null)
     {
         var payload = new ConsentTokenPayload(
             user.Id,
             client.ClientId,
             responseType,
             Guid.NewGuid().ToString("N"),
-            DateTime.UtcNow.Add(ApplicationTokenOptions.ConsentTokenLifetime));
+            DateTime.UtcNow.Add(ApplicationTokenOptions.ConsentTokenLifetime),
+            redirectUri);
 
         var token = TokenPayloads.Protect(payload);
         await _userManager.SetAuthenticationTokenAsync(user, ApplicationTokenOptions.Provider, ConsentTokenName(client.ClientId), token);
@@ -215,6 +238,21 @@ public sealed class AuthWorkflow
     }
 
     public static string RefreshTokenName(Guid clientId) => $"{ApplicationTokenOptions.RefreshTokenPrefix}:{clientId:N}";
+
+    public static bool IsRedirectUriAllowed(Client client, string redirectUri)
+    {
+        if (string.IsNullOrWhiteSpace(client.AllowedOrigins)) return false;
+        if (!Uri.TryCreate(redirectUri, UriKind.Absolute, out var redirect)) return false;
+
+        var redirectOrigin = redirect.GetLeftPart(UriPartial.Authority);
+        var allowedOrigins = client.AllowedOrigins
+            .Split([',', ';', '\n', '\r'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+        return allowedOrigins.Any(origin =>
+            string.Equals(origin.TrimEnd('/'), redirectOrigin.TrimEnd('/'), StringComparison.OrdinalIgnoreCase)
+            || string.Equals(origin, redirectUri, StringComparison.OrdinalIgnoreCase));
+    }
+
     private static string TempTokenName(Guid clientId) => $"{ApplicationTokenOptions.TempTokenPrefix}:{clientId:N}";
     private static string ConsentTokenName(Guid clientId) => $"{ApplicationTokenOptions.ConsentTokenPrefix}:{clientId:N}";
 }

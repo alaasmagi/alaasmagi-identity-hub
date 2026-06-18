@@ -1,8 +1,11 @@
 using System.Reflection;
 using System.Text;
 using Application;
+using Contracts.DataAccess;
 using DataAccess.Context;
+using DataAccess.Repository;
 using DTO.DataAccess.DTO;
+using DTO.DataAccess.Mapper;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -32,9 +35,29 @@ builder.Services.AddDefaultIdentity<AppUserEntity>(options => options.SignIn.Req
     .AddEntityFrameworkStores<AppDbContext>();
 
 builder.Services.AddApplication();
+builder.Services.AddScoped<AppUserEntityMapper>();
+builder.Services.AddScoped<AppRoleEntityMapper>();
+builder.Services.AddScoped<AppUserClientEntityMapper>();
+builder.Services.AddScoped<ClientEntityMapper>();
+builder.Services.AddScoped<SecurityEventEntityMapper>();
+builder.Services.AddScoped<IAppUserRepository, AppUserRepository>();
+builder.Services.AddScoped<IAppRoleRepository, AppRoleRepository>();
+builder.Services.AddScoped<IAppUserClientRepository, AppUserClientRepository>();
+builder.Services.AddScoped<IClientRepository, ClientRepository>();
+builder.Services.AddScoped<ISecurityEventRepository, SecurityEventRepository>();
 builder.Services.AddControllers();
 builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages(options =>
+{
+    options.Conventions.AuthorizeAreaFolder("Admin", "/", "AdminArea");
+});
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("AdminArea", policy =>
+    {
+        policy.AuthenticationSchemes.Add(CookieAuthenticationDefaults.AuthenticationScheme);
+        policy.RequireRole("Admin");
+    });
 
 var authenticationBuilder = builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

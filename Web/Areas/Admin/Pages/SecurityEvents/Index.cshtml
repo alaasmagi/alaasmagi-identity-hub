@@ -1,0 +1,45 @@
+@page
+@model Web.Areas.Admin.Pages.SecurityEvents.IndexModel
+@{
+    ViewData["Title"] = "Security Events";
+}
+
+<h1>Security Events</h1>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-4">
+        <input asp-for="UserId" class="form-control" placeholder="User ID" />
+    </div>
+    <div class="col-md-4">
+        <input asp-for="ClientId" class="form-control" placeholder="Client ID" />
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary">Filter</button>
+    </div>
+</form>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>User</th>
+        <th>Client</th>
+        <th>Type</th>
+        <th>IP address</th>
+        <th>User agent</th>
+        <th>Timestamp</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model.SecurityEvents?.Items ?? [])
+    {
+        <tr>
+            <td>@item.UserId</td>
+            <td>@item.ClientId</td>
+            <td>@item.Type</td>
+            <td>@item.IpAddress</td>
+            <td>@item.UserAgent</td>
+            <td>@item.Timestamp</td>
+        </tr>
+    }
+    </tbody>
+</table>

@@ -111,7 +111,7 @@ public sealed class AuthService : IAuthService
 
         if (await _userManager.GetTwoFactorEnabledAsync(user))
         {
-            var tempToken = await _authWorkflow.CreateTempTokenAsync(user, client, request.ResponseType);
+            var tempToken = await _authWorkflow.CreateTempTokenAsync(user, client, request.ResponseType, request.RedirectUri);
             return Result<LoginResponse>.Success(new LoginResponse
             {
                 RequiresTwoFactor = true,
@@ -119,7 +119,12 @@ public sealed class AuthService : IAuthService
             });
         }
 
-        var response = await _authWorkflow.ContinueAfterAuthenticationAsync(user, client, request.ResponseType);
+        if (request.ResponseType == "cookie")
+        {
+            await _signInManager.SignInAsync(user, isPersistent: false);
+        }
+
+        var response = await _authWorkflow.ContinueAfterAuthenticationAsync(user, client, request.ResponseType, request.RedirectUri);
         if (response.Error is not null) return Result<LoginResponse>.Failure(response.Error);
 
         await _securityEventService.LogAsync(ESecurityEventType.Login, user, client, null, null);

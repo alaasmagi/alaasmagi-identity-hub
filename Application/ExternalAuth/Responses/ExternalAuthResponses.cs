@@ -12,7 +12,9 @@ public sealed record ProvidersResponse(IReadOnlyList<string> Providers);
 /// Response returned after a successful external callback.
 /// </summary>
 /// <param name="Code">The generated auth code.</param>
-public sealed record ExternalCallbackResponse(string Code);
+/// <param name="RequiresConsent">Whether the external user must grant client consent before login completes.</param>
+/// <param name="ConsentToken">The consent token when consent is required.</param>
+public sealed record ExternalCallbackResponse(string? Code, bool RequiresConsent = false, string? ConsentToken = null);
 
 /// <summary>
 /// Response containing runtime claims for an external MVC service.

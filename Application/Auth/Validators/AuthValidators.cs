@@ -21,6 +21,12 @@ public sealed class LoginRequestValidator : AbstractValidator<LoginRequest>
         RuleFor(request => request.Password).NotEmpty();
         RuleFor(request => request.ClientId).NotEmpty();
         RuleFor(request => request.ResponseType).Must(value => value is "jwt" or "cookie");
+        When(request => request.ResponseType == "cookie", () =>
+        {
+            RuleFor(request => request.RedirectUri)
+                .NotEmpty()
+                .Must(value => Uri.TryCreate(value, UriKind.Absolute, out _));
+        });
     }
 }
 

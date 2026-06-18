@@ -69,7 +69,7 @@ public sealed class ExternalAuthService : IExternalAuthService
         var client = await _authWorkflow.GetActiveClientAsync(request.ClientId);
         if (client is null) return Result<ExternalCallbackResponse>.Failure("InvalidClient");
 
-        if (!IsRedirectUriAllowed(client, request.RedirectUri))
+        if (!AuthWorkflow.IsRedirectUriAllowed(client, request.RedirectUri))
         {
             return Result<ExternalCallbackResponse>.Failure("InvalidRedirectUri");
         }
@@ -124,8 +124,8 @@ public sealed class ExternalAuthService : IExternalAuthService
         var userClient = await _userClientRepository.GetByUserAndClientAsync(user.Id, client.ClientId);
         if (userClient is null)
         {
-            await _authWorkflow.CreateConsentTokenAsync(user, client, "cookie");
-            return Result<ExternalCallbackResponse>.Failure("ConsentRequired");
+            var consentToken = await _authWorkflow.CreateConsentTokenAsync(user, client, "cookie", request.RedirectUri);
+            return Result<ExternalCallbackResponse>.Success(new ExternalCallbackResponse(null, RequiresConsent: true, consentToken));
         }
 
         if (userClient.Status == EUserClientStatus.Pending) return Result<ExternalCallbackResponse>.Failure("AwaitingApproval");
@@ -167,20 +167,6 @@ public sealed class ExternalAuthService : IExternalAuthService
 
         var claims = await _authWorkflow.BuildRuntimeClaimsAsync(user, client);
         return Result<ClaimsResponse>.Success(new ClaimsResponse(claims));
-    }
-
-    private static bool IsRedirectUriAllowed(Client client, string redirectUri)
-    {
-        if (string.IsNullOrWhiteSpace(client.AllowedOrigins)) return false;
-        if (!Uri.TryCreate(redirectUri, UriKind.Absolute, out var redirect)) return false;
-
-        var redirectOrigin = redirect.GetLeftPart(UriPartial.Authority);
-        var allowedOrigins = client.AllowedOrigins
-            .Split([',', ';', '\n', '\r'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-
-        return allowedOrigins.Any(origin =>
-            string.Equals(origin.TrimEnd('/'), redirectOrigin.TrimEnd('/'), StringComparison.OrdinalIgnoreCase)
-            || string.Equals(origin, redirectUri, StringComparison.OrdinalIgnoreCase));
     }
 
     private static bool IsClientSecretValid(Client client, string clientSecret)

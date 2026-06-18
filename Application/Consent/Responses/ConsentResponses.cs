@@ -25,6 +25,11 @@ public sealed class ConsentResponse
     public string? RefreshToken { get; init; }
 
     /// <summary>
+    /// Gets the issued auth code when a cookie/federated response is requested.
+    /// </summary>
+    public string? AuthCode { get; init; }
+
+    /// <summary>
     /// Gets the resulting user-client status.
     /// </summary>
     public EUserClientStatus? Status { get; init; }

@@ -1,0 +1,17 @@
+@page
+@model Web.Areas.Admin.Pages.Roles.DetailsModel
+@{
+    ViewData["Title"] = "Role Details";
+}
+
+<h1>Role Details</h1>
+
+<dl class="row">
+    <dt class="col-sm-3">Name</dt>
+    <dd class="col-sm-9">@Model.AppRoleEntity.Name</dd>
+    <dt class="col-sm-3">Client</dt>
+    <dd class="col-sm-9">@(Model.AppRoleEntity.Client?.Name ?? Model.AppRoleEntity.ClientId.ToString())</dd>
+</dl>
+
+<a asp-page="./Edit" asp-route-id="@Model.AppRoleEntity.Id">Edit</a> |
+<a asp-page="./Index">Back to List</a>

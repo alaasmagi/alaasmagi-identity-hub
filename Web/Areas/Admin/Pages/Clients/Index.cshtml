@@ -1,0 +1,40 @@
+@page
+@model Web.Areas.Admin.Pages.Clients.IndexModel
+@{
+    ViewData["Title"] = "Clients";
+}
+
+<h1>Clients</h1>
+
+<p>
+    <a asp-page="Create" class="btn btn-primary">Create New</a>
+</p>
+<table class="table">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Client ID</th>
+        <th>Allowed Origins</th>
+        <th>Active</th>
+        <th>Registration Type</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model.ClientEntity)
+    {
+        <tr>
+            <td>@item.Name</td>
+            <td>@item.ClientId</td>
+            <td>@item.AllowedOrigins</td>
+            <td>@item.IsActive</td>
+            <td>@item.RegistrationType</td>
+            <td class="text-end">
+                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

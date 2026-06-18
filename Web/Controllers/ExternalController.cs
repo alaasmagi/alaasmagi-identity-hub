@@ -103,7 +103,12 @@ public sealed class ExternalController : ApiControllerBase
         var result = await _externalAuthService.HandleExternalCallbackAsync(
             new ExternalCallbackRequest(provider, clientId, redirectUri, tenantId));
 
-        if (result.IsSuccess && result.Value is not null)
+        if (result.IsSuccess && result.Value is { RequiresConsent: true })
+        {
+            return Redirect(QueryHelpers.AddQueryString(redirectUri, "error", "ConsentRequired"));
+        }
+
+        if (result.IsSuccess && !string.IsNullOrWhiteSpace(result.Value?.Code))
         {
             return Redirect(QueryHelpers.AddQueryString(redirectUri, "code", result.Value.Code));
         }

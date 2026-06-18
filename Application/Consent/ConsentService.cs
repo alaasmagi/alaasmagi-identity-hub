@@ -73,9 +73,12 @@ public sealed class ConsentService : IConsentService
         var existing = await _userClientRepository.GetByUserAndClientAsync(user.Id, client.ClientId);
         if (existing is { Status: EUserClientStatus.Active })
         {
-            var loginResponse = await _authWorkflow.IssueLoginResponseAsync(user, client);
+            var loginResponse = await _authWorkflow.IssueLoginResponseAsync(user, client, payload.ResponseType, payload.RedirectUri);
+            if (loginResponse.Error is not null) return Result<ConsentResponse>.Failure(loginResponse.Error);
+
             return Result<ConsentResponse>.Success(new ConsentResponse
             {
+                AuthCode = loginResponse.AuthCode,
                 AccessToken = loginResponse.AccessToken,
                 RefreshToken = loginResponse.RefreshToken,
                 Status = EUserClientStatus.Active
@@ -124,9 +127,12 @@ public sealed class ConsentService : IConsentService
         }
 
         await _authWorkflow.AssignDefaultRoleIfPresentAsync(user, client);
-        var response = await _authWorkflow.IssueLoginResponseAsync(user, client);
+        var response = await _authWorkflow.IssueLoginResponseAsync(user, client, payload.ResponseType, payload.RedirectUri);
+        if (response.Error is not null) return Result<ConsentResponse>.Failure(response.Error);
+
         return Result<ConsentResponse>.Success(new ConsentResponse
         {
+            AuthCode = response.AuthCode,
             AccessToken = response.AccessToken,
             RefreshToken = response.RefreshToken,
             Status = EUserClientStatus.Active
