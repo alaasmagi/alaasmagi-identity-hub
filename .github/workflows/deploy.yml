@@ -90,7 +90,9 @@ jobs:
           install -m 700 -d ~/.ssh
           printf '%s\n' "${VPS_SSH_KEY}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H -p "${VPS_PORT:-22}" "${VPS_HOST}" >> ~/.ssh/known_hosts
+          PORT="${VPS_PORT:-22}"
+          ssh-keyscan -T 30 -H -p "${PORT}" "${VPS_HOST}" >> ~/.ssh/known_hosts || \
+            echo "Warning: ssh-keyscan failed for VPS_HOST on port ${PORT}; SSH will use StrictHostKeyChecking=accept-new."
 
       - name: Upload image and compose files to VPS
         env:
@@ -102,10 +104,10 @@ jobs:
 
           PORT="${VPS_PORT:-22}"
 
-          ssh -i ~/.ssh/deploy_key -p "${PORT}" "${VPS_USER}@${VPS_HOST}" \
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new -p "${PORT}" "${VPS_USER}@${VPS_HOST}" \
             "mkdir -p '${REMOTE_APP_DIR}' && chown '${VPS_USER}:${VPS_USER}' '${REMOTE_APP_DIR}'"
 
-          scp -i ~/.ssh/deploy_key -P "${PORT}" \
+          scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new -P "${PORT}" \
             image.tar.gz .env compose.yaml \
             "${VPS_USER}@${VPS_HOST}:${REMOTE_APP_DIR}/"
 
@@ -121,7 +123,7 @@ jobs:
 
           PORT="${VPS_PORT:-22}"
 
-          ssh -i ~/.ssh/deploy_key -p "${PORT}" "${VPS_USER}@${VPS_HOST}" \
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new -p "${PORT}" "${VPS_USER}@${VPS_HOST}" \
             IMAGE_NAME="${IMAGE_NAME}" \
             IMAGE_TAG="${GITHUB_SHA}" \
             REMOTE_APP_DIR="${REMOTE_APP_DIR}" \
