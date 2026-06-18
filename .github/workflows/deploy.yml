@@ -1,0 +1,158 @@
+name: Build and Deploy Docker Image
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-identity-hub
+  cancel-in-progress: true
+
+env:
+  IMAGE_NAME: alaasmagi-identity-hub
+  REMOTE_APP_DIR: /opt/alaasmagi-identity-hub
+  APP_PORT: "8080"
+  HOST_PORT: "8080"
+
+jobs:
+  deploy:
+    name: Build and deploy
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'push' &&
+       github.ref == 'refs/heads/main' &&
+       contains(github.event.head_commit.message, '[DEPLOY]'))
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          set -euo pipefail
+          docker build --pull --file Web/Dockerfile -t "${IMAGE_NAME}:${GITHUB_SHA}" .
+
+      - name: Save Docker image
+        run: |
+          set -euo pipefail
+          docker save "${IMAGE_NAME}:${GITHUB_SHA}" | gzip > image.tar.gz
+
+      - name: Create runtime env file from GitHub secrets
+        env:
+          APP_PORT: ${{ secrets.CONTAINER_PORT || secrets.APP_PORT || env.APP_PORT }}
+          HOST_PORT: ${{ secrets.HOST_PORT || secrets.APP_PORT || env.HOST_PORT }}
+          CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
+          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+          BREVO_SENDER_EMAIL: ${{ secrets.BREVO_SENDER_EMAIL }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          MICROSOFT_CLIENT_ID: ${{ secrets.MICROSOFT_CLIENT_ID }}
+          MICROSOFT_CLIENT_SECRET: ${{ secrets.MICROSOFT_CLIENT_SECRET }}
+          MAIN_CLIENT_NAME: ${{ secrets.MAIN_CLIENT_NAME }}
+          MAIN_REDIRECT_PATH: ${{ secrets.MAIN_REDIRECT_PATH }}
+        run: |
+          set -euo pipefail
+
+          : "${CONNECTION_STRING:?CONNECTION_STRING is required}"
+
+          {
+            printf 'ASPNETCORE_ENVIRONMENT=%s\n' 'Production'
+            printf 'APP_PORT=%s\n' "${APP_PORT}"
+            printf 'HOST_PORT=%s\n' "${HOST_PORT}"
+            printf 'ASPNETCORE_URLS=%s\n' "http://+:${APP_PORT}"
+
+            printf 'CONNECTION_STRING=%s\n' "${CONNECTION_STRING}"
+            printf 'BREVO_API_KEY=%s\n' "${BREVO_API_KEY}"
+            printf 'BREVO_SENDER_EMAIL=%s\n' "${BREVO_SENDER_EMAIL:-identity@alaasmagi.dev}"
+
+            printf 'GOOGLE_CLIENT_ID=%s\n' "${GOOGLE_CLIENT_ID}"
+            printf 'GOOGLE_CLIENT_SECRET=%s\n' "${GOOGLE_CLIENT_SECRET}"
+            printf 'MICROSOFT_CLIENT_ID=%s\n' "${MICROSOFT_CLIENT_ID}"
+            printf 'MICROSOFT_CLIENT_SECRET=%s\n' "${MICROSOFT_CLIENT_SECRET}"
+
+            printf 'MAIN_CLIENT_NAME=%s\n' "${MAIN_CLIENT_NAME:-main}"
+            printf 'MAIN_REDIRECT_PATH=%s\n' "${MAIN_REDIRECT_PATH:-/Admin/Users}"
+          } > .env
+
+          chmod 600 .env
+
+      - name: Configure SSH
+        env:
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_PORT: ${{ secrets.VPS_PORT }}
+        run: |
+          set -euo pipefail
+
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "${VPS_SSH_KEY}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H -p "${VPS_PORT:-22}" "${VPS_HOST}" >> ~/.ssh/known_hosts
+
+      - name: Upload image and compose files to VPS
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_PORT: ${{ secrets.VPS_PORT }}
+        run: |
+          set -euo pipefail
+
+          PORT="${VPS_PORT:-22}"
+
+          ssh -i ~/.ssh/deploy_key -p "${PORT}" "${VPS_USER}@${VPS_HOST}" \
+            "mkdir -p '${REMOTE_APP_DIR}' && chown '${VPS_USER}:${VPS_USER}' '${REMOTE_APP_DIR}'"
+
+          scp -i ~/.ssh/deploy_key -P "${PORT}" \
+            image.tar.gz .env compose.yaml \
+            "${VPS_USER}@${VPS_HOST}:${REMOTE_APP_DIR}/"
+
+      - name: Run docker compose on VPS
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_PORT: ${{ secrets.VPS_PORT }}
+          APP_PORT: ${{ secrets.CONTAINER_PORT || secrets.APP_PORT || env.APP_PORT }}
+          HOST_PORT: ${{ secrets.HOST_PORT || secrets.APP_PORT || env.HOST_PORT }}
+        run: |
+          set -euo pipefail
+
+          PORT="${VPS_PORT:-22}"
+
+          ssh -i ~/.ssh/deploy_key -p "${PORT}" "${VPS_USER}@${VPS_HOST}" \
+            IMAGE_NAME="${IMAGE_NAME}" \
+            IMAGE_TAG="${GITHUB_SHA}" \
+            REMOTE_APP_DIR="${REMOTE_APP_DIR}" \
+            APP_PORT="${APP_PORT}" \
+            HOST_PORT="${HOST_PORT}" \
+            'bash -s' <<'EOF_REMOTE'
+          set -euo pipefail
+
+          if docker info >/dev/null 2>&1; then
+            DOCKER="docker"
+          else
+            DOCKER="sudo docker"
+          fi
+
+          if $DOCKER compose version >/dev/null 2>&1; then
+            COMPOSE_CMD=($DOCKER compose)
+          elif command -v docker-compose >/dev/null 2>&1; then
+            COMPOSE_CMD=(docker-compose)
+          else
+            echo "Docker Compose is required on the target host." >&2
+            exit 1
+          fi
+
+          cd "$REMOTE_APP_DIR"
+
+          gunzip -c image.tar.gz | $DOCKER load
+
+          chmod 600 .env
+
+          export IMAGE_NAME IMAGE_TAG APP_PORT HOST_PORT
+          "${COMPOSE_CMD[@]}" --env-file .env -f compose.yaml up -d --remove-orphans
+
+          $DOCKER image prune -f
+          EOF_REMOTE

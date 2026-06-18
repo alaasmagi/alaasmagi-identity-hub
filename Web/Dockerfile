@@ -7,7 +7,13 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
+COPY ["Directory.Build.props", "./"]
 COPY ["Web/Web.csproj", "Web/"]
+COPY ["Application/Application.csproj", "Application/"]
+COPY ["Contracts/Contracts.csproj", "Contracts/"]
+COPY ["DataAccess/DataAccess.csproj", "DataAccess/"]
+COPY ["DTO/DTO.csproj", "DTO/"]
+COPY ["Domain/Domain.csproj", "Domain/"]
 RUN dotnet restore "Web/Web.csproj"
 COPY . .
 WORKDIR "/src/Web"

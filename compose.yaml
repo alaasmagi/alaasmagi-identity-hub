@@ -1,7 +1,11 @@
 ﻿services:
   web:
-    image: web
-    build:
-      context: .
-      dockerfile: Web/Dockerfile
-
+    image: ${IMAGE_NAME:-alaasmagi-identity-hub}:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:${APP_PORT:-8080}
+    ports:
+      - "${HOST_PORT:-8080}:${APP_PORT:-8080}"
