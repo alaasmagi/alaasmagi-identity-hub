@@ -1,20 +1,20 @@
 ﻿@page
 @model RegisterConfirmationModel
 @{
-    ViewData["Title"] = "Register confirmation";
+    ViewData["Title"] = L["Register confirmation"];
 }
 
 <h1>@ViewData["Title"]</h1>
 <p>
-    Please check your email to confirm your account.
+    @L["Please check your email to confirm your account."]
 </p>
 <p class="text-muted">
-    If email delivery is not configured, the confirmation token is written to the application log.
+    @L["If email delivery is not configured, the confirmation token is written to the application log."]
 </p>
 <p>
     <a asp-page="./Login"
        asp-route-clientId="@Model.ClientId"
        asp-route-redirectUri="@Model.RedirectUri"
-       asp-route-returnUrl="@Model.ReturnUrl">Back to sign in</a>
+       asp-route-returnUrl="@Model.ReturnUrl">@L["Back to sign in"]</a>
 </p>
 

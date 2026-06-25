@@ -29,13 +29,13 @@ public class TwoFactorAuthenticationModel : PageModel
     {
         if (!AccountFlow.TryGetUserId(User, out var userId))
         {
-            return NotFound("Unable to load the current user.");
+            return NotFound(AccountFlow.Text(this, "Unable to load the current user."));
         }
 
         var result = await _twoFactorService.GetStatusAsync(userId);
         if (!result.IsSuccess || result.Value is null)
         {
-            return NotFound("Unable to load two-factor status.");
+            return NotFound(AccountFlow.Text(this, "Unable to load two-factor status."));
         }
 
         HasAuthenticator = result.Value.HasAuthenticator;

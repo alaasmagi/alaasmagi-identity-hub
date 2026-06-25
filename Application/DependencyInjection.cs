@@ -1,5 +1,6 @@
 using Application.Admin;
 using Application.Auth;
+using Application.ClientRoles;
 using Application.Common.Auth;
 using Application.Consent;
 using Application.ExternalAuth;
@@ -19,6 +20,7 @@ public static class DependencyInjection
         services.AddScoped<ITwoFactorService, TwoFactorService>();
         services.AddScoped<IExternalAuthService, ExternalAuthService>();
         services.AddScoped<IAdminService, AdminService>();
+        services.AddScoped<IClientRoleService, ClientRoleService>();
 
         services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
 

@@ -53,6 +53,9 @@ jobs:
           MICROSOFT_CLIENT_SECRET: ${{ secrets.MICROSOFT_CLIENT_SECRET }}
           MAIN_CLIENT_NAME: ${{ secrets.MAIN_CLIENT_NAME }}
           MAIN_REDIRECT_PATH: ${{ secrets.MAIN_REDIRECT_PATH }}
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+          ACCESS_TOKEN_SECONDS: ${{ secrets.ACCESS_TOKEN_SECONDS }}
+          REFRESH_TOKEN_SECONDS: ${{ secrets.REFRESH_TOKEN_SECONDS }}
         run: |
           set -euo pipefail
 
@@ -75,6 +78,9 @@ jobs:
 
             printf 'MAIN_CLIENT_NAME=%s\n' "${MAIN_CLIENT_NAME:-main}"
             printf 'MAIN_REDIRECT_PATH=%s\n' "${MAIN_REDIRECT_PATH:-/Admin/Users}"
+            printf 'ADMIN_EMAIL=%s\n' "${ADMIN_EMAIL}"
+            printf 'ACCESS_TOKEN_SECONDS=%s\n' "${ACCESS_TOKEN_SECONDS:-900}"
+            printf 'REFRESH_TOKEN_SECONDS=%s\n' "${REFRESH_TOKEN_SECONDS:-604800}"
           } > .env
 
           chmod 600 .env

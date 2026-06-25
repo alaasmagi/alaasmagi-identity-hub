@@ -1,3 +1,4 @@
+@inherits Microsoft.AspNetCore.Mvc.Razor.RazorPage<dynamic>
 @{
     Layout = "/Views/Shared/_Layout.cshtml";
     var currentPath = Context.Request.Path.Value ?? string.Empty;
@@ -6,15 +7,13 @@
 <div class="row">
     <div class="col-md-3 col-lg-2 mb-3">
         <nav class="nav flex-column nav-pills">
-            <a class="nav-link @(currentPath.Contains("/Admin/Users", StringComparison.OrdinalIgnoreCase) ? "active" : null)" asp-area="Admin" asp-page="/Users/Index">Users</a>
-            <a class="nav-link @(currentPath.Contains("/Admin/Clients", StringComparison.OrdinalIgnoreCase) ? "active" : null)" asp-area="Admin" asp-page="/Clients/Index">Clients</a>
-            <a class="nav-link @(currentPath.Contains("/Admin/Roles", StringComparison.OrdinalIgnoreCase) ? "active" : null)" asp-area="Admin" asp-page="/Roles/Index">Roles</a>
-            <a class="nav-link @(currentPath.Contains("/Admin/SecurityEvents", StringComparison.OrdinalIgnoreCase) ? "active" : null)" asp-area="Admin" asp-page="/SecurityEvents/Index">Security Events</a>
+            <a class="nav-link @(currentPath.Contains("/Admin/Users", StringComparison.OrdinalIgnoreCase) ? "active" : null)" asp-area="Admin" asp-page="/Users/Index">@L["Users"]</a>
+            <a class="nav-link @(currentPath.Contains("/Admin/Clients", StringComparison.OrdinalIgnoreCase) ? "active" : null)" asp-area="Admin" asp-page="/Clients/Index">@L["Clients"]</a>
+            <a class="nav-link @(currentPath.Contains("/Admin/Roles", StringComparison.OrdinalIgnoreCase) ? "active" : null)" asp-area="Admin" asp-page="/Roles/Index">@L["Roles"]</a>
+            <a class="nav-link @(currentPath.Contains("/Admin/SecurityEvents", StringComparison.OrdinalIgnoreCase) ? "active" : null)" asp-area="Admin" asp-page="/SecurityEvents/Index">@L["Security Events"]</a>
         </nav>
     </div>
     <div class="col-md-9 col-lg-10">
         @RenderBody()
     </div>
 </div>
-
-@await RenderSectionAsync("Scripts", required: false)

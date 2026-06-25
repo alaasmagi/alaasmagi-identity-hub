@@ -36,7 +36,7 @@ public class ExternalLoginModel : PageModel
     {
         if (string.IsNullOrWhiteSpace(provider) || ClientId == Guid.Empty || string.IsNullOrWhiteSpace(RedirectUri))
         {
-            ErrorMessage = "Invalid external login request.";
+            ErrorMessage = AccountFlow.Text(this, "Invalid external login request.");
             return RedirectToPage("./Login", AccountFlow.RouteValues(ClientId, RedirectUri, returnUrl: ReturnUrl));
         }
 
@@ -71,7 +71,7 @@ public class ExternalLoginModel : PageModel
 
         if (!string.IsNullOrWhiteSpace(remoteError))
         {
-            ErrorMessage = $"Error from external provider: {remoteError}";
+            ErrorMessage = AccountFlow.Text(this, "Error from external provider:") + $" {remoteError}";
             return RedirectToPage("./Login", AccountFlow.RouteValues(clientId, redirectUri, returnUrl: returnUrl));
         }
 
@@ -80,7 +80,7 @@ public class ExternalLoginModel : PageModel
 
         if (!result.IsSuccess || result.Value is null)
         {
-            ErrorMessage = AccountFlow.ToDisplayError(result.Error);
+            ErrorMessage = AccountFlow.ToDisplayError(this, result.Error);
             return RedirectToPage("./Login", AccountFlow.RouteValues(clientId, redirectUri, returnUrl: returnUrl));
         }
 

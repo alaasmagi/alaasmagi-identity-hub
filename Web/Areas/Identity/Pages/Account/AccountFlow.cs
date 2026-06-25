@@ -3,6 +3,7 @@ using Application.Auth.Responses;
 using Application.Common;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Localization;
 using Microsoft.AspNetCore.WebUtilities;
 
 namespace Web.Areas.Identity.Pages.Account;
@@ -37,7 +38,7 @@ public static class AccountFlow
     {
         if (!result.IsSuccess || result.Value is null)
         {
-            page.ModelState.AddModelError(string.Empty, ToDisplayError(result.Error));
+            page.ModelState.AddModelError(string.Empty, ToDisplayError(page, result.Error));
             return page.Page();
         }
 
@@ -54,7 +55,7 @@ public static class AccountFlow
 
         if (!string.IsNullOrWhiteSpace(response.Error))
         {
-            page.ModelState.AddModelError(string.Empty, ToDisplayError(response.Error));
+            page.ModelState.AddModelError(string.Empty, ToDisplayError(page, response.Error));
             return page.Page();
         }
 
@@ -65,7 +66,7 @@ public static class AccountFlow
     {
         if (string.IsNullOrWhiteSpace(redirectUri) || string.IsNullOrWhiteSpace(authCode))
         {
-            page.ModelState.AddModelError(string.Empty, "The authentication flow could not be completed.");
+            page.ModelState.AddModelError(string.Empty, Text(page, "The authentication flow could not be completed."));
             return page.Page();
         }
 
@@ -76,7 +77,7 @@ public static class AccountFlow
     {
         if (string.IsNullOrWhiteSpace(redirectUri))
         {
-            page.ModelState.AddModelError(string.Empty, "The authentication flow could not be completed.");
+            page.ModelState.AddModelError(string.Empty, Text(page, "The authentication flow could not be completed."));
             return page.Page();
         }
 
@@ -106,5 +107,16 @@ public static class AccountFlow
             "InvalidRecoveryCode" => "The recovery code is invalid.",
             _ => "The request could not be completed."
         };
+    }
+
+    public static string ToDisplayError(PageModel page, string? error)
+    {
+        return Text(page, ToDisplayError(error));
+    }
+
+    public static string Text(PageModel page, string key)
+    {
+        var localizer = page.HttpContext.RequestServices.GetRequiredService<IStringLocalizer<Web.Resources>>();
+        return localizer[key];
     }
 }

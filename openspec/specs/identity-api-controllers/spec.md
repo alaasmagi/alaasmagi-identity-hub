@@ -2,9 +2,7 @@
 
 ## Purpose
 The Web API layer exposes the centralized identity Application services through documented ASP.NET Core API controllers.
-
 ## Requirements
-
 ### Requirement: API controllers dispatch to Application services
 The Web API layer SHALL expose controllers for authentication, two-factor authentication, consent, external authentication, and admin operations that call Application service interfaces directly and do not implement business logic.
 
@@ -21,7 +19,7 @@ The Web API layer SHALL expose controllers for authentication, two-factor authen
 - **THEN** it reads `ClaimTypes.NameIdentifier` from the current principal and does not trust an acting user id from the request body
 
 ### Requirement: Result responses are mapped consistently
-The Web API layer SHALL provide a shared `ApiControllerBase` with `HandleResult<T>` that maps Application `Result<T>` values to HTTP responses.
+The Web API layer SHALL provide a shared `ApiControllerBase` with `HandleResult<T>` that maps Application `Result<T>` values to HTTP responses and documents that global API rate limiting can return HTTP 429 before action result mapping.
 
 #### Scenario: Successful result with value
 - **WHEN** `HandleResult<T>` receives a successful result with a value
@@ -46,6 +44,10 @@ The Web API layer SHALL provide a shared `ApiControllerBase` with `HandleResult<
 #### Scenario: Validation or business failure
 - **WHEN** `HandleResult<T>` receives any other failed result
 - **THEN** it returns HTTP 400 with an `{ error }` payload
+
+#### Scenario: Rate limit rejection bypasses result mapping
+- **WHEN** global API rate limiting rejects a request before controller action execution
+- **THEN** the response is HTTP 429 with a rate-limit error payload and `Retry-After` header
 
 ### Requirement: Authentication endpoints are exposed
 The Web API layer SHALL expose `AuthController` at `api/auth` for local account authentication flows.
@@ -215,3 +217,114 @@ The Web project SHALL configure controllers, authentication schemes, authorizati
 #### Scenario: XML documentation is generated
 - **WHEN** the Web project is built
 - **THEN** XML documentation is generated and included by Swagger configuration
+
+### Requirement: Client management endpoints are exposed
+The Web API layer SHALL expose `ClientManagementController` at `api/client` for client role synchronization and delegated user-role management.
+
+#### Scenario: Controller dispatches to client role service
+- **WHEN** a client management action handles a request
+- **THEN** it retrieves `Client` from `HttpContext.Items["AuthenticatedClient"]` and calls `IClientRoleService` without implementing role business logic
+
+#### Scenario: Role sync endpoint is exposed
+- **WHEN** `POST api/client/roles/sync` receives a valid sync body and valid client credentials
+- **THEN** it calls `IClientRoleService.SyncRolesAsync` with the authenticated client's database id and returns HTTP 200 with synced roles and default role
+
+#### Scenario: User roles endpoint is exposed
+- **WHEN** `GET api/client/users/{userId:guid}/roles` receives valid client credentials
+- **THEN** it calls `IClientRoleService.GetUserRolesAsync` and returns HTTP 200 with the user's client-scoped roles
+
+#### Scenario: Set user roles endpoint is exposed
+- **WHEN** `POST api/client/users/{userId:guid}/roles` receives valid client credentials and a role replacement body
+- **THEN** it calls `IClientRoleService.SetUserRolesAsync` and returns HTTP 200 on success
+
+#### Scenario: Remove user role endpoint is exposed
+- **WHEN** `DELETE api/client/users/{userId:guid}/roles/{roleName}` receives valid client credentials
+- **THEN** it calls `IClientRoleService.RemoveUserRoleAsync` and returns HTTP 200 on success
+
+#### Scenario: User not in client maps to not found
+- **WHEN** a client role service result fails with `UserNotInClient`
+- **THEN** the controller returns HTTP 404 with an `{ error }` payload
+
+### Requirement: Client management endpoints use client credential filtering
+The Web API layer SHALL apply `ClientAuthenticationFilter` to each client management action and SHALL NOT require JWT bearer authorization for those actions.
+
+#### Scenario: Filter is applied per action
+- **WHEN** a client management action is executed
+- **THEN** `[ServiceFilter(typeof(ClientAuthenticationFilter))]` authenticates the calling client for that action
+
+#### Scenario: No controller-level JWT authorization is required
+- **WHEN** `ClientManagementController` is defined
+- **THEN** it has no controller-level `[Authorize]` requirement for JWT bearer authentication
+
+#### Scenario: Filter is registered in dependency injection
+- **WHEN** Web services are configured
+- **THEN** `ClientAuthenticationFilter` is registered as a scoped service
+
+### Requirement: Client management endpoints are documented in Swagger
+The Web API layer SHALL document client management endpoints and their client credential headers in Swagger/OpenAPI.
+
+#### Scenario: Client credential security definition is registered
+- **WHEN** Swagger is configured
+- **THEN** it includes a `ClientCredentials` API key security definition for `X-Client-Id` with a description that also requires `X-Client-Secret`
+
+#### Scenario: Client credential headers are added only to client management operations
+- **WHEN** Swagger generates operations for `ClientManagementController`
+- **THEN** an operation filter adds required `X-Client-Id` and `X-Client-Secret` header parameters to those operations only
+
+#### Scenario: Action XML documentation is present
+- **WHEN** Swagger metadata is generated for `ClientManagementController`
+- **THEN** every action has XML `<summary>` documentation, `<remarks>` noting header-based client credentials instead of JWT bearer, and `ProducesResponseType` entries for each documented status code
+
+#### Scenario: Controller produces JSON
+- **WHEN** `ClientManagementController` is defined
+- **THEN** it has `[Produces("application/json")]` metadata
+
+### Requirement: API endpoints are rate limited
+The Web API layer SHALL apply ASP.NET Core fixed-window rate limiting to all API endpoints by client IP address.
+
+#### Scenario: Default API rate limit applies
+- **WHEN** any API endpoint is called without a stricter endpoint policy
+- **THEN** the endpoint is limited to 60 requests per 60 seconds for the caller IP address
+
+#### Scenario: Rate limit rejection returns JSON
+- **WHEN** a request exceeds an applicable rate limit
+- **THEN** the system returns HTTP 429 with `{ "error": "TooManyRequests" }`
+
+#### Scenario: Retry after header is included
+- **WHEN** a request is rejected by rate limiting
+- **THEN** the response includes a `Retry-After` header derived from the limiter metadata
+
+#### Scenario: Rate limit partition uses IP address
+- **WHEN** a rate limit partition is selected
+- **THEN** the partition key is `HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown"` and does not use user identity, JWT claims, or client id
+
+### Requirement: Sensitive authentication endpoints use strict rate limiting
+The Web API layer SHALL apply the `auth-strict` rate-limiting policy to sensitive authentication actions.
+
+#### Scenario: Strict authentication limit applies
+- **WHEN** a sensitive authentication endpoint is called
+- **THEN** the endpoint is limited to 10 requests per 60 seconds for the caller IP address
+
+#### Scenario: Strict endpoints are marked
+- **WHEN** API controllers are inspected
+- **THEN** register, login, password reset request, password reset confirmation, two-factor login, recovery-code login, consent grant, and external challenge actions have `[EnableRateLimiting("auth-strict")]`
+
+#### Scenario: Strict endpoint Swagger documents 429
+- **WHEN** Swagger metadata is generated for an action with `[EnableRateLimiting("auth-strict")]`
+- **THEN** that action documents HTTP 429 as a possible response
+
+### Requirement: Admin client APIs accept allowed-origin lists
+The Admin API SHALL expose allowed origins as structured string lists in client create and edit request DTOs while serializing to `Client.AllowedOrigins` JSON internally.
+
+#### Scenario: Client create serializes allowed origins
+- **WHEN** `POST /api/admin/clients` receives a client create body with `AllowedOrigins` as a list of URL strings
+- **THEN** the controller serializes that list to JSON before passing or saving the client data
+
+#### Scenario: Client edit serializes allowed origins
+- **WHEN** `PUT /api/admin/clients/{id}` receives a client edit body with `AllowedOrigins` as a list of URL strings
+- **THEN** the controller serializes that list to JSON before passing or saving the client data
+
+#### Scenario: Swagger describes allowed-origin list semantics
+- **WHEN** Swagger metadata is generated for admin client create or edit actions
+- **THEN** the action remarks document that `AllowedOrigins` is supplied as a list and stored internally as JSON
+

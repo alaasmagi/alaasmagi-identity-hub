@@ -1,27 +1,27 @@
 @page
 @model Web.Areas.Admin.Pages.Users.IndexModel
 @{
-    ViewData["Title"] = "Users";
+    ViewData["Title"] = L["Users"];
 }
 
-<h1>Users</h1>
+<h1>@L["Users"]</h1>
 
 <form method="get" class="row g-2 mb-3">
     <div class="col-md-6">
-        <input asp-for="Search" class="form-control" placeholder="Search users" />
+        <input asp-for="Search" class="form-control" placeholder="@L["Search users"]" />
     </div>
     <div class="col-auto">
-        <button type="submit" class="btn btn-primary">Search</button>
+        <button type="submit" class="btn btn-primary">@L["Search"]</button>
     </div>
 </form>
 
 <table class="table">
     <thead>
     <tr>
-        <th>Full name</th>
-        <th>Email</th>
-        <th>Active</th>
-        <th>Banned</th>
+        <th>@L["Full name"]</th>
+        <th>@L["Email"]</th>
+        <th>@L["Active"]</th>
+        <th>@L["Banned"]</th>
         <th></th>
     </tr>
     </thead>
@@ -34,8 +34,8 @@
             <td>@user.IsActive</td>
             <td>@user.IsBanned</td>
             <td class="text-end">
-                <a asp-page="./Clients" asp-route-userId="@user.UserId" class="btn btn-sm btn-outline-primary">View Clients</a>
-                <a asp-page="./Ban" asp-route-userId="@user.UserId" asp-route-isBanned="@user.IsBanned" class="btn btn-sm btn-outline-secondary">@(user.IsBanned ? "Unban" : "Ban")</a>
+                <a asp-page="./Clients" asp-route-userId="@user.UserId" class="btn btn-sm btn-outline-primary">@L["Manage Access"]</a>
+                <a asp-page="./Ban" asp-route-userId="@user.UserId" asp-route-isBanned="@user.IsBanned" class="btn btn-sm btn-outline-secondary">@(user.IsBanned ? L["Unban"] : L["Ban"])</a>
             </td>
         </tr>
     }

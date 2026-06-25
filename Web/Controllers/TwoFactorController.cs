@@ -5,6 +5,7 @@ using Application.TwoFactor.Responses;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Web.Contracts.Requests;
 using Web.Contracts.Responses;
 
@@ -113,8 +114,10 @@ public sealed class TwoFactorController : ApiControllerBase
     /// <returns>The login response.</returns>
     [HttpPost("login")]
     [AllowAnonymous]
+    [EnableRateLimiting("auth-strict")]
     [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> Login([FromBody] TwoFactorLoginRequest request)
     {
         return HandleResult(await _twoFactorService.LoginWithTwoFactorAsync(request));
@@ -127,8 +130,10 @@ public sealed class TwoFactorController : ApiControllerBase
     /// <returns>The login response.</returns>
     [HttpPost("login/recovery")]
     [AllowAnonymous]
+    [EnableRateLimiting("auth-strict")]
     [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> LoginWithRecoveryCode([FromBody] RecoveryLoginRequest request)
     {
         return HandleResult(await _twoFactorService.LoginWithRecoveryCodeAsync(request));

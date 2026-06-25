@@ -1,0 +1,29 @@
+@using System.Globalization
+@{
+    var currentCulture = CultureInfo.CurrentUICulture.Name;
+    var returnUrl = Context.Request.PathBase + Context.Request.Path + Context.Request.QueryString;
+    var languages = new[]
+    {
+        new { Culture = "en-US", Label = "English" },
+        new { Culture = "et-EE", Label = "Eesti" },
+        new { Culture = "fi-FI", Label = "Suomi" }
+    };
+}
+
+<ul class="navbar-nav ms-sm-2">
+    @foreach (var language in languages)
+    {
+        var isActive = string.Equals(currentCulture, language.Culture, StringComparison.OrdinalIgnoreCase);
+        <li class="nav-item">
+            <a asp-area=""
+               asp-controller="Culture"
+               asp-action="Set"
+               asp-route-culture="@language.Culture"
+               asp-route-returnUrl="@returnUrl"
+               class="nav-link text-dark @(isActive ? "active fw-semibold" : null)"
+               aria-current="@(isActive ? "true" : null)">
+                @language.Label
+            </a>
+        </li>
+    }
+</ul>

@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Security.Cryptography;
+using Application.Common.Auth;
 using DataAccess.Context;
 using Domain;
 using DTO.DataAccess.DTO;
@@ -58,7 +59,7 @@ public class CreateModel : PageModel
             Name = Input.Name,
             ClientId = clientId,
             ClientSecretHash = new PasswordHasher<ClientEntity>().HashPassword(null!, secret),
-            AllowedOrigins = Input.AllowedOrigins,
+            AllowedOrigins = AllowedOriginsHelper.Serialize(ParseAllowedOrigins(Input.AllowedOrigins)),
             IsActive = Input.IsActive,
             RegistrationType = Input.RegistrationType,
             CreatedBy = User.Identity?.Name ?? "admin",
@@ -84,5 +85,13 @@ public class CreateModel : PageModel
     private static string GenerateSecret()
     {
         return Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
+    }
+
+    private static List<string> ParseAllowedOrigins(string? origins)
+    {
+        return (origins ?? string.Empty)
+            .Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Where(origin => !string.IsNullOrWhiteSpace(origin))
+            .ToList();
     }
 }

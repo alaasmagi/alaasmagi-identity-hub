@@ -42,7 +42,7 @@ public class ResetPasswordModel : PageModel
         var resetToken = token ?? code;
         if (userId == Guid.Empty || string.IsNullOrWhiteSpace(resetToken))
         {
-            return BadRequest("A user id and token must be supplied for password reset.");
+            return BadRequest(AccountFlow.Text(this, "A user id and token must be supplied for password reset."));
         }
 
         Input = new InputModel
@@ -69,7 +69,7 @@ public class ResetPasswordModel : PageModel
             return RedirectToPage("./ResetPasswordConfirmation");
         }
 
-        ModelState.AddModelError(string.Empty, AccountFlow.ToDisplayError(result.Error));
+        ModelState.AddModelError(string.Empty, AccountFlow.ToDisplayError(this, result.Error));
         return Page();
     }
 }

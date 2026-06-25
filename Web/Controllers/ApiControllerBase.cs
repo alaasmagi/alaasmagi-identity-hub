@@ -12,6 +12,7 @@ public abstract class ApiControllerBase : ControllerBase
 {
     /// <summary>
     /// Maps an Application result to a standardized HTTP response.
+    /// All API endpoints can also return HTTP 429 when the global rate limiter rejects the request.
     /// </summary>
     /// <param name="result">The result returned by the Application service.</param>
     /// <typeparam name="T">The result value type.</typeparam>
@@ -26,7 +27,7 @@ public abstract class ApiControllerBase : ControllerBase
         var error = new ErrorResponse(result.Error ?? "UnknownError");
         return result.Error switch
         {
-            "NotFound" => NotFound(error),
+            "NotFound" or "UserNotInClient" => NotFound(error),
             "Unauthorized" or "AccessRevoked" or "InvalidClientSecret" => Unauthorized(error),
             "AwaitingApproval" or "NotInvited" => StatusCode(StatusCodes.Status403Forbidden, error),
             _ => BadRequest(error)

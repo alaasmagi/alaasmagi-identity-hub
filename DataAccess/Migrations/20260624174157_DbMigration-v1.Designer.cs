@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260615184033_DbMigration-v1")]
+    [Migration("20260624174157_DbMigration-v1")]
     partial class DbMigrationv1
     {
         /// <inheritdoc />
@@ -285,6 +285,9 @@ namespace DataAccess.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)");
 
+                    b.Property<Guid?>("DefaultRoleId")
+                        .HasColumnType("uuid");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
@@ -308,6 +311,8 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("ClientId")
                         .IsUnique();
+
+                    b.HasIndex("DefaultRoleId");
 
                     b.ToTable("Clients");
                 });
@@ -503,6 +508,16 @@ namespace DataAccess.Migrations
                     b.Navigation("Client");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("DTO.DataAccess.DTO.ClientEntity", b =>
+                {
+                    b.HasOne("DTO.DataAccess.DTO.AppRoleEntity", "DefaultRole")
+                        .WithMany()
+                        .HasForeignKey("DefaultRoleId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("DefaultRole");
                 });
 
             modelBuilder.Entity("DTO.DataAccess.DTO.SecurityEventEntity", b =>

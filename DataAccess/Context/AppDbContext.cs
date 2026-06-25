@@ -69,6 +69,11 @@ public class AppDbContext : IdentityDbContext<AppUserEntity, AppRoleEntity, Guid
                 .HasMaxLength(SerializedListMaxLength);
 
             entity.HasIndex(e => e.ClientId).IsUnique();
+
+            entity.HasOne(e => e.DefaultRole)
+                .WithMany()
+                .HasForeignKey(e => e.DefaultRoleId)
+                .OnDelete(DeleteBehavior.SetNull);
         });
 
         modelBuilder.Entity<AppUserEntity>(entity =>

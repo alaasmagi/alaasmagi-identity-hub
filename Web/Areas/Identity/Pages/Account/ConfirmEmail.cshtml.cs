@@ -26,7 +26,9 @@ public class ConfirmEmailModel : PageModel
         }
 
         var result = await _authService.ConfirmEmailAsync(new ConfirmEmailRequest(userId, confirmationToken));
-        StatusMessage = result.IsSuccess ? "Thank you for confirming your email." : "Error confirming your email.";
+        StatusMessage = result.IsSuccess
+            ? AccountFlow.Text(this, "Thank you for confirming your email.")
+            : AccountFlow.Text(this, "Error confirming your email.");
         return Page();
     }
 }

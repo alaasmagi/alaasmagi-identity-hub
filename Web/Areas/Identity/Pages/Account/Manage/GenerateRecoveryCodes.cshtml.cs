@@ -37,14 +37,14 @@ public class GenerateRecoveryCodesModel : PageModel
     {
         return AccountFlow.TryGetUserId(User, out _)
             ? Page()
-            : NotFound("Unable to load the current user.");
+            : NotFound(AccountFlow.Text(this, "Unable to load the current user."));
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
         if (!AccountFlow.TryGetUserId(User, out var userId))
         {
-            return NotFound("Unable to load the current user.");
+            return NotFound(AccountFlow.Text(this, "Unable to load the current user."));
         }
 
         if (!ModelState.IsValid)
@@ -56,12 +56,12 @@ public class GenerateRecoveryCodesModel : PageModel
         var result = await _twoFactorService.RegenerateRecoveryCodesAsync(new RegenerateCodesRequest(userId, code));
         if (!result.IsSuccess || result.Value is null)
         {
-            ModelState.AddModelError(string.Empty, AccountFlow.ToDisplayError(result.Error));
+            ModelState.AddModelError(string.Empty, AccountFlow.ToDisplayError(this, result.Error));
             return Page();
         }
 
         RecoveryCodes = result.Value.RecoveryCodes.ToArray();
-        StatusMessage = "You have generated new recovery codes.";
+        StatusMessage = AccountFlow.Text(this, "You have generated new recovery codes.");
         return RedirectToPage("./ShowRecoveryCodes");
     }
 }

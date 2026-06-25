@@ -46,7 +46,7 @@ public class LoginWith2faModel : PageModel
     {
         if (string.IsNullOrWhiteSpace(TempToken))
         {
-            ModelState.AddModelError(string.Empty, "The two-factor login request is no longer valid.");
+            ModelState.AddModelError(string.Empty, AccountFlow.Text(this, "The two-factor login request is no longer valid."));
         }
 
         return Page();

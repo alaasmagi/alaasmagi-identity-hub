@@ -19,7 +19,7 @@ public class LoginModel : PageModel
     private readonly IClientRepository _clientRepository;
     private readonly SignInManager<AppUserEntity> _signInManager;
     private readonly UserManager<AppUserEntity> _userManager;
-    private readonly BootstrapAdminService _bootstrapAdminService;
+    private readonly AdminProvisioningService _adminProvisioningService;
 
     public LoginModel(
         IAuthService authService,
@@ -27,14 +27,14 @@ public class LoginModel : PageModel
         IClientRepository clientRepository,
         SignInManager<AppUserEntity> signInManager,
         UserManager<AppUserEntity> userManager,
-        BootstrapAdminService bootstrapAdminService)
+        AdminProvisioningService adminProvisioningService)
     {
         _authService = authService;
         _externalAuthService = externalAuthService;
         _clientRepository = clientRepository;
         _signInManager = signInManager;
         _userManager = userManager;
-        _bootstrapAdminService = bootstrapAdminService;
+        _adminProvisioningService = adminProvisioningService;
     }
 
     [BindProperty]
@@ -95,7 +95,7 @@ public class LoginModel : PageModel
             var clientFlowUser = await _userManager.FindByEmailAsync(Input.Email);
             if (clientFlowUser is not null)
             {
-                await _bootstrapAdminService.EnsureBootstrapAdminAsync(clientFlowUser);
+                await _adminProvisioningService.EnsureConfiguredAdminAsync(clientFlowUser);
             }
 
             var result = await _authService.LoginAsync(
@@ -107,25 +107,26 @@ public class LoginModel : PageModel
         var user = await _userManager.FindByEmailAsync(Input.Email);
         if (user is null)
         {
-            ModelState.AddModelError(string.Empty, AccountFlow.ToDisplayError("InvalidCredentials"));
+            ModelState.AddModelError(string.Empty, AccountFlow.ToDisplayError(this, "InvalidCredentials"));
             return Page();
         }
+
+        await _adminProvisioningService.EnsureConfiguredAdminAsync(user);
 
         var signInResult = await _signInManager.CheckPasswordSignInAsync(user, Input.Password, lockoutOnFailure: true);
         if (signInResult.Succeeded)
         {
-            await _bootstrapAdminService.EnsureBootstrapAdminAsync(user);
             await _signInManager.SignInAsync(user, Input.RememberMe);
             return LocalRedirect(ReturnUrl ?? "/Admin/Users");
         }
 
         if (signInResult.IsNotAllowed)
         {
-            ModelState.AddModelError(string.Empty, AccountFlow.ToDisplayError("EmailNotConfirmed"));
+            ModelState.AddModelError(string.Empty, AccountFlow.ToDisplayError(this, "EmailNotConfirmed"));
             return Page();
         }
 
-        ModelState.AddModelError(string.Empty, AccountFlow.ToDisplayError("InvalidCredentials"));
+        ModelState.AddModelError(string.Empty, AccountFlow.ToDisplayError(this, "InvalidCredentials"));
         return Page();
     }
 

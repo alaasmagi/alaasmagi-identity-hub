@@ -20,10 +20,21 @@ public class ClientRepository : BaseRepository<Client, ClientEntity, ClientEntit
         _mapper = repositoryMapper;
     }
 
+    public async Task<Client?> GetByDatabaseIdAsync(Guid id)
+    {
+        var entity = await _context.Clients
+            .AsNoTracking()
+            .Include(client => client.DefaultRole)
+            .FirstOrDefaultAsync(client => client.Id == id);
+
+        return _mapper.Map(entity);
+    }
+
     public async Task<Client?> GetByClientIdAsync(Guid clientId)
     {
         var entity = await _context.Clients
             .AsNoTracking()
+            .Include(client => client.DefaultRole)
             .FirstOrDefaultAsync(client => client.ClientId == clientId);
 
         return _mapper.Map(entity);
@@ -36,5 +47,27 @@ public class ClientRepository : BaseRepository<Client, ClientEntity, ClientEntit
             .ToListAsync();
 
         return _mapper.Map(entities).ToList();
+    }
+
+    public async Task UpdateClientAsync(Client client)
+    {
+        var entity = await _context.Clients
+            .FirstOrDefaultAsync(existing => existing.Id == client.Id || existing.ClientId == client.ClientId);
+
+        if (entity is null)
+        {
+            return;
+        }
+
+        entity.Name = client.Name;
+        entity.ClientId = client.ClientId;
+        entity.ClientSecretHash = client.ClientSecretHash;
+        entity.AllowedOrigins = client.AllowedOrigins;
+        entity.IsActive = client.IsActive;
+        entity.RegistrationType = client.RegistrationType;
+        entity.DefaultRoleId = client.DefaultRoleId;
+        entity.UpdatedAt = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync();
     }
 }

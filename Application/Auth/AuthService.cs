@@ -160,9 +160,10 @@ public sealed class AuthService : IAuthService
             return Result<TokenResponse>.Failure("InvalidRefreshToken");
         }
 
-        if (!await _authWorkflow.ValidateRefreshTokenAsync(user, request.ClientId, request.RefreshToken))
+        var refreshTokenValidation = await _authWorkflow.ValidateRefreshTokenAsync(user, request.ClientId, request.RefreshToken);
+        if (!refreshTokenValidation.IsSuccess)
         {
-            return Result<TokenResponse>.Failure("InvalidRefreshToken");
+            return Result<TokenResponse>.Failure(refreshTokenValidation.Error ?? "InvalidRefreshToken");
         }
 
         var response = await _authWorkflow.ContinueAfterAuthenticationAsync(user, client, "jwt");

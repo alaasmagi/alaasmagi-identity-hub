@@ -1,5 +1,6 @@
 using Contracts.DataAccess;
 using DataAccess.Context;
+using Application.Common.Auth;
 using Domain;
 using DTO.DataAccess.DTO;
 using Microsoft.AspNetCore.Identity;
@@ -60,7 +61,7 @@ public sealed class MainClientResolver
             Name = mainClientName,
             ClientId = clientId,
             ClientSecretHash = new PasswordHasher<ClientEntity>().HashPassword(null!, Guid.NewGuid().ToString("N")),
-            AllowedOrigins = allowedOrigin,
+            AllowedOrigins = AllowedOriginsHelper.Serialize([allowedOrigin]),
             IsActive = true,
             RegistrationType = ERegistrationType.Open,
             CreatedBy = actor,

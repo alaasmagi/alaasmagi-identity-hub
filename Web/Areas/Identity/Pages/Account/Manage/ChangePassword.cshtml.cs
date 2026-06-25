@@ -45,7 +45,7 @@ public class ChangePasswordModel : PageModel
     {
         return AccountFlow.TryGetUserId(User, out _)
             ? Page()
-            : NotFound("Unable to load the current user.");
+            : NotFound(AccountFlow.Text(this, "Unable to load the current user."));
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -57,7 +57,7 @@ public class ChangePasswordModel : PageModel
 
         if (!AccountFlow.TryGetUserId(User, out var userId))
         {
-            return NotFound("Unable to load the current user.");
+            return NotFound(AccountFlow.Text(this, "Unable to load the current user."));
         }
 
         var result = await _authService.ChangePasswordAsync(
@@ -65,11 +65,11 @@ public class ChangePasswordModel : PageModel
 
         if (!result.IsSuccess)
         {
-            ModelState.AddModelError(string.Empty, AccountFlow.ToDisplayError(result.Error));
+            ModelState.AddModelError(string.Empty, AccountFlow.ToDisplayError(this, result.Error));
             return Page();
         }
 
-        StatusMessage = "Your password has been changed.";
+        StatusMessage = AccountFlow.Text(this, "Your password has been changed.");
         return RedirectToPage();
     }
 }

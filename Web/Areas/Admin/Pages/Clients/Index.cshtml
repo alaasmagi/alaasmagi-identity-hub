@@ -1,22 +1,22 @@
 @page
 @model Web.Areas.Admin.Pages.Clients.IndexModel
 @{
-    ViewData["Title"] = "Clients";
+    ViewData["Title"] = L["Clients"];
 }
 
-<h1>Clients</h1>
+<h1>@L["Clients"]</h1>
 
 <p>
-    <a asp-page="Create" class="btn btn-primary">Create New</a>
+    <a asp-page="Create" class="btn btn-primary">@L["Create New"]</a>
 </p>
 <table class="table">
     <thead>
     <tr>
-        <th>Name</th>
-        <th>Client ID</th>
-        <th>Allowed Origins</th>
-        <th>Active</th>
-        <th>Registration Type</th>
+        <th>@L["Name"]</th>
+        <th>@L["Client ID"]</th>
+        <th>@L["Allowed Origins"]</th>
+        <th>@L["Active"]</th>
+        <th>@L["Registration Type"]</th>
         <th></th>
     </tr>
     </thead>
@@ -30,9 +30,9 @@
             <td>@item.IsActive</td>
             <td>@item.RegistrationType</td>
             <td class="text-end">
-                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+                <a asp-page="./Edit" asp-route-id="@item.Id">@L["Edit"]</a> |
+                <a asp-page="./Details" asp-route-id="@item.Id">@L["Details"]</a> |
+                <a asp-page="./Delete" asp-route-id="@item.Id">@L["Delete"]</a>
             </td>
         </tr>
     }

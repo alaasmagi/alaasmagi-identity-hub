@@ -18,7 +18,18 @@ public class ClientEntityMapper : IMapper<Client, ClientEntity>
             ClientSecretHash = entity.ClientSecretHash,
             AllowedOrigins = entity.AllowedOrigins,
             IsActive = entity.IsActive,
-            RegistrationType = entity.RegistrationType
+            RegistrationType = entity.RegistrationType,
+            DefaultRoleId = entity.DefaultRoleId,
+            DefaultRole = entity.DefaultRole is null
+                ? null
+                : new AppRole
+                {
+                    Id = entity.DefaultRole.Id,
+                    Name = entity.DefaultRole.Name,
+                    NormalizedName = entity.DefaultRole.NormalizedName,
+                    ConcurrencyStamp = entity.DefaultRole.ConcurrencyStamp,
+                    ClientId = entity.DefaultRole.ClientId
+                }
         };
     }
 
@@ -39,7 +50,8 @@ public class ClientEntityMapper : IMapper<Client, ClientEntity>
             ClientSecretHash = entity.ClientSecretHash,
             AllowedOrigins = entity.AllowedOrigins,
             IsActive = entity.IsActive,
-            RegistrationType = entity.RegistrationType
+            RegistrationType = entity.RegistrationType,
+            DefaultRoleId = entity.DefaultRoleId
         };
     }
 

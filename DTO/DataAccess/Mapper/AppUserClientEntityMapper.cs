@@ -28,6 +28,19 @@ public class AppUserClientEntityMapper : IMapper<AppUserClient, AppUserClientEnt
                     BanReason = entity.User.BanReason
                 },
             ClientId = entity.ClientId,
+            Client = entity.Client is null
+                ? null
+                : new Client
+                {
+                    Id = entity.Client.Id,
+                    Name = entity.Client.Name,
+                    ClientId = entity.Client.ClientId,
+                    ClientSecretHash = entity.Client.ClientSecretHash,
+                    AllowedOrigins = entity.Client.AllowedOrigins,
+                    IsActive = entity.Client.IsActive,
+                    RegistrationType = entity.Client.RegistrationType,
+                    DefaultRoleId = entity.Client.DefaultRoleId
+                },
             Status = entity.Status,
             GrantedAt = entity.GrantedAt,
             GrantedBy = entity.GrantedBy,
@@ -66,6 +79,19 @@ public class AppUserClientEntityMapper : IMapper<AppUserClient, AppUserClientEnt
                     BanReason = entity.User.BanReason
                 },
             ClientId = entity.ClientId,
+            Client = entity.Client is null
+                ? null
+                : new ClientEntity
+                {
+                    Id = entity.Client.Id,
+                    Name = entity.Client.Name,
+                    ClientId = entity.Client.ClientId,
+                    ClientSecretHash = entity.Client.ClientSecretHash,
+                    AllowedOrigins = entity.Client.AllowedOrigins,
+                    IsActive = entity.Client.IsActive,
+                    RegistrationType = entity.Client.RegistrationType,
+                    DefaultRoleId = entity.Client.DefaultRoleId
+                },
             Status = entity.Status,
             GrantedAt = entity.GrantedAt,
             GrantedBy = entity.GrantedBy,

@@ -2,34 +2,94 @@
 @using Domain
 @model Web.Areas.Admin.Pages.Users.ClientsModel
 @{
-    ViewData["Title"] = "User Clients";
+    ViewData["Title"] = L["User Access"];
 }
 
-<h1>User Clients</h1>
+<h1>@L["User Access"]</h1>
+
+@if (Model.TargetUser is not null)
+{
+    <p class="text-muted">@Model.TargetUser.FullName &lt;@Model.TargetUser.Email&gt;</p>
+}
+
+@if (!string.IsNullOrWhiteSpace(Model.StatusMessage))
+{
+    <div class="alert alert-info" role="alert">@Model.StatusMessage</div>
+}
 
 <table class="table">
     <thead>
     <tr>
-        <th>Client</th>
-        <th>Status</th>
-        <th>Granted at</th>
-        <th>Revoked at</th>
+        <th>@L["Client"]</th>
+        <th>@L["Status"]</th>
+        <th>@L["Granted at"]</th>
+        <th>@L["Revoked at"]</th>
+        <th>@L["Roles"]</th>
         <th></th>
     </tr>
     </thead>
     <tbody>
-    @foreach (var item in Model.UserClients)
+    @foreach (var row in Model.ClientAccess)
     {
+        var item = row.UserClient;
+        var isActive = item?.Status == EUserClientStatus.Active;
+        var assignedRoles = row.AssignedRoles.ToHashSet(StringComparer.OrdinalIgnoreCase);
         <tr>
-            <td>@(item.Client?.Name ?? item.ClientId.ToString())</td>
-            <td>@item.Status</td>
-            <td>@item.GrantedAt</td>
-            <td>@item.RevokedAt</td>
-            <td class="text-end">
-                @if (item.Status == EUserClientStatus.Pending)
+            <td>
+                <div>@row.Client.Name</div>
+                <small class="text-muted">@row.Client.Id</small>
+            </td>
+            <td>@(item?.Status.ToString() ?? L["Not granted"].Value)</td>
+            <td>@item?.GrantedAt</td>
+            <td>@item?.RevokedAt</td>
+            <td>
+                @if (isActive)
                 {
-                    <form method="post" asp-page-handler="Approve" asp-route-clientId="@item.ClientId" class="d-inline">
-                        <button type="submit" class="btn btn-sm btn-primary">Approve</button>
+                    <form method="post" asp-page-handler="Roles" asp-route-userId="@Model.UserId" asp-route-clientId="@row.Client.Id">
+                        @if (row.AvailableRoles.Count == 0)
+                        {
+                            <span class="text-muted">@L["No roles"]</span>
+                        }
+                        else
+                        {
+                            foreach (var role in row.AvailableRoles)
+                            {
+                                <div class="form-check">
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           name="roles"
+                                           value="@role.Name"
+                                           id="role-@row.Client.Id-@role.Id"
+                                           checked="@assignedRoles.Contains(role.Name ?? string.Empty)" />
+                                    <label class="form-check-label" for="role-@row.Client.Id-@role.Id">@role.Name</label>
+                                </div>
+                            }
+                        }
+                        <button type="submit" class="btn btn-sm btn-outline-primary mt-2">@L["Save Roles"]</button>
+                    </form>
+                }
+                else
+                {
+                    <span class="text-muted">@L["Grant access before assigning roles."]</span>
+                }
+            </td>
+            <td class="text-end">
+                @if (item?.Status == EUserClientStatus.Pending)
+                {
+                    <form method="post" asp-page-handler="Approve" asp-route-userId="@Model.UserId" asp-route-clientId="@row.Client.Id" class="d-inline">
+                        <button type="submit" class="btn btn-sm btn-primary">@L["Approve"]</button>
+                    </form>
+                }
+                @if (isActive)
+                {
+                    <form method="post" asp-page-handler="Revoke" asp-route-userId="@Model.UserId" asp-route-clientId="@row.Client.Id" class="d-inline">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">@L["Revoke"]</button>
+                    </form>
+                }
+                else if (item?.Status != EUserClientStatus.Pending)
+                {
+                    <form method="post" asp-page-handler="Grant" asp-route-userId="@Model.UserId" asp-route-clientId="@row.Client.Id" class="d-inline">
+                        <button type="submit" class="btn btn-sm btn-outline-primary">@L["Grant"]</button>
                     </form>
                 }
             </td>
@@ -38,4 +98,4 @@
     </tbody>
 </table>
 
-<a asp-page="./Index">Back to users</a>
+<a asp-page="./Index">@L["Back to users"]</a>

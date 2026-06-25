@@ -1,7 +1,7 @@
 @page
 @model ConsentModel
 @{
-    ViewData["Title"] = "Authorize application";
+    ViewData["Title"] = L["Authorize application"];
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -9,7 +9,7 @@
     <div class="col-md-6">
         <section>
             <form method="post">
-                <h2>@(Model.ClientName ?? "This application") would like to access your account.</h2>
+                <h2>@L["AuthorizeApplicationMessage", Model.ClientName ?? L["This application"].Value]</h2>
                 <hr />
                 <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
                 <input type="hidden" asp-for="ClientId" />
@@ -24,11 +24,11 @@
                 {
                     @if (Model.RegistrationType is not null)
                     {
-                        <p class="text-muted">Registration type: @Model.RegistrationType</p>
+                        <p class="text-muted">@L["Registration type:"] @Model.RegistrationType</p>
                     }
                     <div class="d-flex gap-2">
-                        <button type="submit" asp-page-handler="Approve" class="btn btn-primary">Approve</button>
-                        <button type="submit" asp-page-handler="Deny" class="btn btn-outline-secondary">Deny</button>
+                        <button type="submit" asp-page-handler="Approve" class="btn btn-primary">@L["Approve"]</button>
+                        <button type="submit" asp-page-handler="Deny" class="btn btn-outline-secondary">@L["Deny"]</button>
                     </div>
                 }
             </form>
@@ -36,6 +36,4 @@
     </div>
 </div>
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
+<partial name="_ValidationScriptsPartial" />

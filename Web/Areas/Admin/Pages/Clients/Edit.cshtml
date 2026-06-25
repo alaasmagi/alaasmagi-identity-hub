@@ -1,16 +1,16 @@
 @page
 @model Web.Areas.Admin.Pages.Clients.EditModel
 @{
-    ViewData["Title"] = "Edit Client";
+    ViewData["Title"] = L["Edit Client"];
 }
 
-<h1>Edit Client</h1>
+<h1>@L["Edit Client"]</h1>
 
 @if (!string.IsNullOrWhiteSpace(Model.GeneratedSecret))
 {
     <div class="alert alert-warning">
-        <p><strong>New client secret shown once.</strong> Store it now; it cannot be viewed again.</p>
-        <p><strong>Client Secret:</strong> <code>@Model.GeneratedSecret</code></p>
+        <p><strong>@L["New client secret shown once."]</strong> @L["Store it now; it cannot be viewed again."]</p>
+        <p><strong>@L["Client Secret:"]</strong> <code>@Model.GeneratedSecret</code></p>
     </div>
 }
 
@@ -21,17 +21,18 @@
             <input type="hidden" asp-for="Input.Id" />
             <input type="hidden" asp-for="Input.ClientId" />
             <div class="mb-3">
-                <label class="form-label">Client ID</label>
+                <label class="form-label">@L["Client ID"]</label>
                 <input value="@Model.Input.ClientId" class="form-control" readonly />
             </div>
             <div class="form-floating mb-3">
-                <input asp-for="Input.Name" class="form-control" placeholder="Name" />
+                <input asp-for="Input.Name" class="form-control" placeholder="@L["Name"]" />
                 <label asp-for="Input.Name" class="form-label"></label>
                 <span asp-validation-for="Input.Name" class="text-danger"></span>
             </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.AllowedOrigins" class="form-control" placeholder="https://example.com" />
+            <div class="mb-3">
                 <label asp-for="Input.AllowedOrigins" class="form-label"></label>
+                <textarea asp-for="Input.AllowedOrigins" class="form-control" rows="4" placeholder="https://example.com"></textarea>
+                <small class="form-text text-muted">@L["Enter one allowed origin URL per line."]</small>
             </div>
             <div class="mb-3">
                 <label asp-for="Input.RegistrationType" class="form-label"></label>
@@ -41,13 +42,11 @@
                 <input class="form-check-input" asp-for="Input.IsActive" />
                 <label class="form-check-label" asp-for="Input.IsActive"></label>
             </div>
-            <button type="submit" class="btn btn-primary">Save</button>
-            <button type="submit" asp-page-handler="RegenerateSecret" class="btn btn-outline-danger">Regenerate Secret</button>
-            <a asp-page="./Index" class="btn btn-outline-secondary">Back</a>
+            <button type="submit" class="btn btn-primary">@L["Save"]</button>
+            <button type="submit" asp-page-handler="RegenerateSecret" class="btn btn-outline-danger">@L["Regenerate Secret"]</button>
+            <a asp-page="./Index" class="btn btn-outline-secondary">@L["Back"]</a>
         </form>
     </div>
 </div>
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
+<partial name="_ValidationScriptsPartial" />

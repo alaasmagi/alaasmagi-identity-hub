@@ -2,9 +2,14 @@ using Application.Admin;
 using Application.Admin.Requests;
 using Application.Admin.Responses;
 using Application.Common;
+using Application.Common.Auth;
+using DataAccess.Context;
 using Domain;
+using DTO.DataAccess.DTO;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Web.Contracts.Requests;
 using Web.Contracts.Responses;
 
@@ -21,14 +26,100 @@ namespace Web.Controllers;
 public sealed class AdminController : ApiControllerBase
 {
     private readonly IAdminService _adminService;
+    private readonly AppDbContext _dbContext;
 
     /// <summary>
     /// Initializes a new admin controller.
     /// </summary>
     /// <param name="adminService">The admin service.</param>
-    public AdminController(IAdminService adminService)
+    /// <param name="dbContext">The application database context.</param>
+    public AdminController(IAdminService adminService, AppDbContext dbContext)
     {
         _adminService = adminService;
+        _dbContext = dbContext;
+    }
+
+    /// <summary>
+    /// Creates a client.
+    /// </summary>
+    /// <remarks>
+    /// Supply <c>AllowedOrigins</c> as a JSON array of exact redirect URL strings. The controller serializes the list to the internal `Client.AllowedOrigins` JSON string before saving. The generated plaintext client secret is returned exactly once in this response.
+    /// </remarks>
+    /// <param name="request">The client create request.</param>
+    /// <returns>The created client and one-time plaintext secret.</returns>
+    [HttpPost("clients")]
+    [ProducesResponseType(typeof(AdminClientResponseDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> CreateClient([FromBody] CreateClientApiRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Name))
+        {
+            return BadRequest(new ErrorResponse("NameRequired"));
+        }
+
+        var secret = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32));
+        var clientId = Guid.NewGuid();
+        var client = new ClientEntity
+        {
+            Id = clientId,
+            Name = request.Name.Trim(),
+            ClientId = clientId,
+            ClientSecretHash = new PasswordHasher<ClientEntity>().HashPassword(null!, secret),
+            AllowedOrigins = AllowedOriginsHelper.Serialize(NormalizeAllowedOrigins(request.AllowedOrigins)),
+            IsActive = request.IsActive,
+            RegistrationType = request.RegistrationType,
+            CreatedBy = User.Identity?.Name ?? "admin",
+            CreatedAt = DateTime.UtcNow,
+            UpdatedBy = User.Identity?.Name ?? "admin",
+            UpdatedAt = DateTime.UtcNow,
+            ConcurrencyToken = Guid.NewGuid().ToString("N")
+        };
+
+        _dbContext.Clients.Add(client);
+        await _dbContext.SaveChangesAsync();
+
+        return CreatedAtAction(nameof(CreateClient), ToResponse(client, secret));
+    }
+
+    /// <summary>
+    /// Updates a client.
+    /// </summary>
+    /// <remarks>
+    /// Supply <c>AllowedOrigins</c> as a JSON array of exact redirect URL strings. The controller serializes the list to the internal `Client.AllowedOrigins` JSON string before saving.
+    /// </remarks>
+    /// <param name="id">The database client identifier.</param>
+    /// <param name="request">The client update request.</param>
+    /// <returns>The updated client.</returns>
+    [HttpPut("clients/{id:guid}")]
+    [ProducesResponseType(typeof(AdminClientResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UpdateClient([FromRoute] Guid id, [FromBody] UpdateClientApiRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Name))
+        {
+            return BadRequest(new ErrorResponse("NameRequired"));
+        }
+
+        var client = await _dbContext.Clients.FirstOrDefaultAsync(existing => existing.Id == id);
+        if (client is null)
+        {
+            return NotFound(new ErrorResponse("NotFound"));
+        }
+
+        client.Name = request.Name.Trim();
+        client.AllowedOrigins = AllowedOriginsHelper.Serialize(NormalizeAllowedOrigins(request.AllowedOrigins));
+        client.IsActive = request.IsActive;
+        client.RegistrationType = request.RegistrationType;
+        client.UpdatedBy = User.Identity?.Name ?? "admin";
+        client.UpdatedAt = DateTime.UtcNow;
+        await _dbContext.SaveChangesAsync();
+
+        return Ok(ToResponse(client));
     }
 
     /// <summary>
@@ -140,5 +231,27 @@ public sealed class AdminController : ApiControllerBase
     {
         return HandleResult(await _adminService.GetSecurityEventsAsync(
             new GetSecurityEventsRequest(userId, clientId, page, pageSize)));
+    }
+
+    private static List<string> NormalizeAllowedOrigins(IEnumerable<string>? origins)
+    {
+        return (origins ?? [])
+            .Select(origin => origin.Trim())
+            .Where(origin => !string.IsNullOrWhiteSpace(origin))
+            .ToList();
+    }
+
+    private static AdminClientResponseDto ToResponse(ClientEntity client, string? clientSecret = null)
+    {
+        return new AdminClientResponseDto
+        {
+            Id = client.Id,
+            ClientId = client.ClientId,
+            Name = client.Name,
+            AllowedOrigins = AllowedOriginsHelper.Parse(client.AllowedOrigins).ToList(),
+            IsActive = client.IsActive,
+            RegistrationType = client.RegistrationType.ToString(),
+            ClientSecret = clientSecret
+        };
     }
 }

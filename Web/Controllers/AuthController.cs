@@ -4,6 +4,7 @@ using Application.Auth.Responses;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Web.Contracts.Requests;
 using Web.Contracts.Responses;
 
@@ -36,8 +37,10 @@ public sealed class AuthController : ApiControllerBase
     /// <returns>The registered user identifier.</returns>
     [HttpPost("register")]
     [AllowAnonymous]
+    [EnableRateLimiting("auth-strict")]
     [ProducesResponseType(typeof(RegisterResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
         var result = await _authService.RegisterAsync(request);
@@ -53,10 +56,12 @@ public sealed class AuthController : ApiControllerBase
     /// <returns>The login response.</returns>
     [HttpPost("login")]
     [AllowAnonymous]
+    [EnableRateLimiting("auth-strict")]
     [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
         return HandleResult(await _authService.LoginAsync(request));
@@ -112,7 +117,9 @@ public sealed class AuthController : ApiControllerBase
     /// <returns>An empty success response.</returns>
     [HttpPost("password/reset/request")]
     [AllowAnonymous]
+    [EnableRateLimiting("auth-strict")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> RequestPasswordReset([FromBody] PasswordResetRequest request)
     {
         return HandleResult(await _authService.RequestPasswordResetAsync(request));
@@ -125,8 +132,10 @@ public sealed class AuthController : ApiControllerBase
     /// <returns>An empty success response.</returns>
     [HttpPost("password/reset/confirm")]
     [AllowAnonymous]
+    [EnableRateLimiting("auth-strict")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
     {
         return HandleResult(await _authService.ResetPasswordAsync(request));

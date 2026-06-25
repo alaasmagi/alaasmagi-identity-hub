@@ -1,32 +1,32 @@
 @page
 @model Web.Areas.Admin.Pages.SecurityEvents.IndexModel
 @{
-    ViewData["Title"] = "Security Events";
+    ViewData["Title"] = L["Security Events"];
 }
 
-<h1>Security Events</h1>
+<h1>@L["Security Events"]</h1>
 
 <form method="get" class="row g-2 mb-3">
     <div class="col-md-4">
-        <input asp-for="UserId" class="form-control" placeholder="User ID" />
+        <input asp-for="UserId" class="form-control" placeholder="@L["User ID"]" />
     </div>
     <div class="col-md-4">
-        <input asp-for="ClientId" class="form-control" placeholder="Client ID" />
+        <input asp-for="ClientId" class="form-control" placeholder="@L["Client ID"]" />
     </div>
     <div class="col-auto">
-        <button type="submit" class="btn btn-primary">Filter</button>
+        <button type="submit" class="btn btn-primary">@L["Filter"]</button>
     </div>
 </form>
 
 <table class="table">
     <thead>
     <tr>
-        <th>User</th>
-        <th>Client</th>
-        <th>Type</th>
-        <th>IP address</th>
-        <th>User agent</th>
-        <th>Timestamp</th>
+        <th>@L["User"]</th>
+        <th>@L["Client"]</th>
+        <th>@L["Type"]</th>
+        <th>@L["IP address"]</th>
+        <th>@L["User agent"]</th>
+        <th>@L["Timestamp"]</th>
     </tr>
     </thead>
     <tbody>

@@ -10,6 +10,8 @@ public class Client : BaseEntity
     public string? AllowedOrigins { get; set; }
     public bool IsActive { get; set; }
     public ERegistrationType RegistrationType { get; set; }
+    public Guid? DefaultRoleId { get; set; }
+    public AppRole? DefaultRole { get; set; }
 
     public ICollection<AppUserClient>? UserClients { get; set; }
     public ICollection<AppRole>? Roles { get; set; }

@@ -1,17 +1,17 @@
 @page
 @model Web.Areas.Admin.Pages.Roles.DetailsModel
 @{
-    ViewData["Title"] = "Role Details";
+    ViewData["Title"] = L["Role Details"];
 }
 
-<h1>Role Details</h1>
+<h1>@L["Role Details"]</h1>
 
 <dl class="row">
-    <dt class="col-sm-3">Name</dt>
+    <dt class="col-sm-3">@L["Name"]</dt>
     <dd class="col-sm-9">@Model.AppRoleEntity.Name</dd>
-    <dt class="col-sm-3">Client</dt>
+    <dt class="col-sm-3">@L["Client"]</dt>
     <dd class="col-sm-9">@(Model.AppRoleEntity.Client?.Name ?? Model.AppRoleEntity.ClientId.ToString())</dd>
 </dl>
 
-<a asp-page="./Edit" asp-route-id="@Model.AppRoleEntity.Id">Edit</a> |
-<a asp-page="./Index">Back to List</a>
+<a asp-page="./Edit" asp-route-id="@Model.AppRoleEntity.Id">@L["Edit"]</a> |
+<a asp-page="./Index">@L["Back to List"]</a>

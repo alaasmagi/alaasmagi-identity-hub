@@ -4,6 +4,7 @@ using Application.ExternalAuth.Responses;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.WebUtilities;
 using Web.Contracts.Requests;
 using Web.Contracts.Responses;
@@ -51,8 +52,10 @@ public sealed class ExternalController : ApiControllerBase
     /// <returns>A challenge result for the external provider.</returns>
     [HttpPost("challenge")]
     [AllowAnonymous]
+    [EnableRateLimiting("auth-strict")]
     [ProducesResponseType(StatusCodes.Status302Found)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public IActionResult ChallengeExternal([FromBody] ExternalChallengeApiRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.Provider) || string.IsNullOrWhiteSpace(request.RedirectUri))

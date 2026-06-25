@@ -46,7 +46,7 @@ public class EnableAuthenticatorModel : PageModel
     {
         if (!AccountFlow.TryGetUserId(User, out var userId))
         {
-            return NotFound("Unable to load the current user.");
+            return NotFound(AccountFlow.Text(this, "Unable to load the current user."));
         }
 
         if (!ModelState.IsValid)
@@ -59,13 +59,13 @@ public class EnableAuthenticatorModel : PageModel
         var result = await _twoFactorService.EnableTwoFactorAsync(new EnableTwoFactorRequest(userId, code));
         if (!result.IsSuccess || result.Value is null)
         {
-            ModelState.AddModelError("Input.Code", AccountFlow.ToDisplayError(result.Error));
+            ModelState.AddModelError("Input.Code", AccountFlow.ToDisplayError(this, result.Error));
             await LoadSetupAsync();
             return Page();
         }
 
         RecoveryCodes = result.Value.RecoveryCodes.ToArray();
-        StatusMessage = "Your authenticator app has been verified.";
+        StatusMessage = AccountFlow.Text(this, "Your authenticator app has been verified.");
         return RedirectToPage("./ShowRecoveryCodes");
     }
 
@@ -73,13 +73,13 @@ public class EnableAuthenticatorModel : PageModel
     {
         if (!AccountFlow.TryGetUserId(User, out var userId))
         {
-            return NotFound("Unable to load the current user.");
+            return NotFound(AccountFlow.Text(this, "Unable to load the current user."));
         }
 
         var result = await _twoFactorService.SetupAuthenticatorAsync(userId);
         if (!result.IsSuccess || result.Value is null)
         {
-            return NotFound("Unable to load authenticator setup.");
+            return NotFound(AccountFlow.Text(this, "Unable to load authenticator setup."));
         }
 
         SharedKey = result.Value.SharedKey;

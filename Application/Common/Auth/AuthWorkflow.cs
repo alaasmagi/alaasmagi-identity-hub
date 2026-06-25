@@ -1,3 +1,5 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Security.Claims;
 using Application.Auth.Responses;
 using Application.Common.Abstractions;
@@ -5,31 +7,33 @@ using Contracts.DataAccess;
 using Domain;
 using DTO.DataAccess.DTO;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 
 namespace Application.Common.Auth;
 
 public sealed class AuthWorkflow
 {
-    private const string DefaultRoleName = "DEFAULT";
-
     private readonly UserManager<AppUserEntity> _userManager;
     private readonly IClientRepository _clientRepository;
     private readonly IAppUserClientRepository _userClientRepository;
     private readonly IAppRoleRepository _roleRepository;
     private readonly ITokenService _tokenService;
+    private readonly TokenLifetimeOptions _tokenLifetimeOptions;
 
     public AuthWorkflow(
         UserManager<AppUserEntity> userManager,
         IClientRepository clientRepository,
         IAppUserClientRepository userClientRepository,
         IAppRoleRepository roleRepository,
-        ITokenService tokenService)
+        ITokenService tokenService,
+        IOptions<TokenLifetimeOptions> tokenLifetimeOptions)
     {
         _userManager = userManager;
         _clientRepository = clientRepository;
         _userClientRepository = userClientRepository;
         _roleRepository = roleRepository;
         _tokenService = tokenService;
+        _tokenLifetimeOptions = tokenLifetimeOptions.Value;
     }
 
     public async Task<Client?> GetActiveClientAsync(Guid clientId)
@@ -129,14 +133,38 @@ public sealed class AuthWorkflow
     {
         var payload = new RefreshTokenPayload(user.Id, client.ClientId, _tokenService.GenerateRefreshToken());
         var token = TokenPayloads.Protect(payload);
-        await _userManager.SetAuthenticationTokenAsync(user, ApplicationTokenOptions.Provider, RefreshTokenName(client.ClientId), token);
+        var stored = JsonSerializer.Serialize(new RefreshTokenStoragePayload(
+            token,
+            DateTime.UtcNow.AddSeconds(_tokenLifetimeOptions.RefreshTokenSeconds)));
+
+        await _userManager.SetAuthenticationTokenAsync(user, ApplicationTokenOptions.Provider, RefreshTokenName(client.ClientId), stored);
         return token;
     }
 
-    public async Task<bool> ValidateRefreshTokenAsync(AppUserEntity user, Guid clientId, string refreshToken)
+    public async Task<Result<Unit>> ValidateRefreshTokenAsync(AppUserEntity user, Guid clientId, string refreshToken)
     {
         var stored = await _userManager.GetAuthenticationTokenAsync(user, ApplicationTokenOptions.Provider, RefreshTokenName(clientId));
-        return string.Equals(stored, refreshToken, StringComparison.Ordinal);
+        if (string.IsNullOrWhiteSpace(stored))
+        {
+            return Result<Unit>.Failure("InvalidRefreshToken");
+        }
+
+        var storedPayload = ParseRefreshTokenStoragePayload(stored);
+        if (storedPayload is null)
+        {
+            return string.Equals(stored, refreshToken, StringComparison.Ordinal)
+                ? Result<Unit>.Success(Unit.Value)
+                : Result<Unit>.Failure("InvalidRefreshToken");
+        }
+
+        if (storedPayload.ExpiresAt < DateTime.UtcNow)
+        {
+            return Result<Unit>.Failure("RefreshTokenExpired");
+        }
+
+        return string.Equals(storedPayload.Token, refreshToken, StringComparison.Ordinal)
+            ? Result<Unit>.Success(Unit.Value)
+            : Result<Unit>.Failure("InvalidRefreshToken");
     }
 
     public Task RevokeRefreshTokenAsync(AppUserEntity user, Guid clientId)
@@ -231,7 +259,13 @@ public sealed class AuthWorkflow
 
     public async Task AssignDefaultRoleIfPresentAsync(AppUserEntity user, Client client)
     {
-        var role = await _roleRepository.GetByNameAndClientIdAsync(DefaultRoleName, client.ClientId);
+        AppRole? role = client.DefaultRole;
+        if (role is null && client.DefaultRoleId.HasValue)
+        {
+            var clientRoles = await _roleRepository.GetByClientIdAsync(client.Id);
+            role = clientRoles.FirstOrDefault(clientRole => clientRole.Id == client.DefaultRoleId.Value);
+        }
+
         if (!string.IsNullOrWhiteSpace(role?.Name) && !await _userManager.IsInRoleAsync(user, role.Name))
         {
             await _userManager.AddToRoleAsync(user, role.Name);
@@ -242,18 +276,28 @@ public sealed class AuthWorkflow
 
     public static bool IsRedirectUriAllowed(Client client, string redirectUri)
     {
-        if (string.IsNullOrWhiteSpace(client.AllowedOrigins)) return false;
-        if (!Uri.TryCreate(redirectUri, UriKind.Absolute, out var redirect)) return false;
+        if (!Uri.TryCreate(redirectUri, UriKind.Absolute, out _)) return false;
 
-        var redirectOrigin = redirect.GetLeftPart(UriPartial.Authority);
-        var allowedOrigins = client.AllowedOrigins
-            .Split([',', ';', '\n', '\r'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-
-        return allowedOrigins.Any(origin =>
-            string.Equals(origin.TrimEnd('/'), redirectOrigin.TrimEnd('/'), StringComparison.OrdinalIgnoreCase)
-            || string.Equals(origin, redirectUri, StringComparison.OrdinalIgnoreCase));
+        var allowedOrigins = AllowedOriginsHelper.Parse(client.AllowedOrigins);
+        return allowedOrigins.Contains(redirectUri, StringComparer.OrdinalIgnoreCase);
     }
 
     private static string TempTokenName(Guid clientId) => $"{ApplicationTokenOptions.TempTokenPrefix}:{clientId:N}";
     private static string ConsentTokenName(Guid clientId) => $"{ApplicationTokenOptions.ConsentTokenPrefix}:{clientId:N}";
+
+    private static RefreshTokenStoragePayload? ParseRefreshTokenStoragePayload(string stored)
+    {
+        try
+        {
+            return JsonSerializer.Deserialize<RefreshTokenStoragePayload>(stored);
+        }
+        catch (JsonException)
+        {
+            return null;
+        }
+    }
+
+    private sealed record RefreshTokenStoragePayload(
+        [property: JsonPropertyName("token")] string Token,
+        [property: JsonPropertyName("expiresAt")] DateTime ExpiresAt);
 }

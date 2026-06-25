@@ -1,22 +1,20 @@
 @page
 @model ResendEmailConfirmationModel
 @{
-    ViewData["Title"] = "Resend email confirmation";
+    ViewData["Title"] = L["Resend email confirmation"];
 }
 
 <h1>@ViewData["Title"]</h1>
-<p class="text-muted">If email delivery is not configured, the confirmation URL is written to the application log.</p>
+<p class="text-muted">@L["If email delivery is not configured, the confirmation URL is written to the application log."]</p>
 
 <form method="post">
     <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
     <div class="form-floating mb-3">
         <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-        <label asp-for="Input.Email">Email</label>
+        <label asp-for="Input.Email">@L["Email"]</label>
         <span asp-validation-for="Input.Email" class="text-danger"></span>
     </div>
-    <button type="submit" class="btn btn-primary">Send confirmation</button>
+    <button type="submit" class="btn btn-primary">@L["Send confirmation"]</button>
 </form>
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
+<partial name="_ValidationScriptsPartial" />

@@ -1,25 +1,49 @@
 using System.Reflection;
+using System.Globalization;
+using System.Threading.RateLimiting;
 using System.Text;
 using Application;
+using Application.Common;
 using Application.Common.Abstractions;
 using Contracts.DataAccess;
 using DataAccess.Context;
 using DataAccess.Repository;
 using DTO.DataAccess.DTO;
 using DTO.DataAccess.Mapper;
+using Web.Filters;
 using Web.Services;
+using Web.Swagger;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using DotNetEnv;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 
 Env.TraversePath().Load();
 
 var builder = WebApplication.CreateBuilder(args);
+var tokenLifetimeConfiguration = new Dictionary<string, string?>();
+if (Environment.GetEnvironmentVariable("ACCESS_TOKEN_SECONDS") is { } accessTokenSeconds)
+{
+    tokenLifetimeConfiguration[$"{TokenLifetimeOptions.SectionName}:AccessTokenSeconds"] = accessTokenSeconds;
+}
+
+if (Environment.GetEnvironmentVariable("REFRESH_TOKEN_SECONDS") is { } refreshTokenSeconds)
+{
+    tokenLifetimeConfiguration[$"{TokenLifetimeOptions.SectionName}:RefreshTokenSeconds"] = refreshTokenSeconds;
+}
+
+if (tokenLifetimeConfiguration.Count > 0)
+{
+    builder.Configuration.AddInMemoryCollection(tokenLifetimeConfiguration);
+}
+
 builder.Host.UseDefaultServiceProvider((context, options) =>
 {
     options.ValidateScopes = context.HostingEnvironment.IsDevelopment();
@@ -51,6 +75,8 @@ builder.Services.ConfigureApplicationCookie(options =>
 });
 
 builder.Services.AddApplication();
+builder.Services.Configure<TokenLifetimeOptions>(
+    builder.Configuration.GetSection(TokenLifetimeOptions.SectionName));
 builder.Services.AddScoped<AppUserEntityMapper>();
 builder.Services.AddScoped<AppRoleEntityMapper>();
 builder.Services.AddScoped<AppUserClientEntityMapper>();
@@ -65,13 +91,24 @@ builder.Services.AddScoped<IEmailService, LoggingEmailService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ISecurityEventService, SecurityEventService>();
 builder.Services.AddScoped<MainClientResolver>();
-builder.Services.AddScoped<BootstrapAdminService>();
+builder.Services.AddScoped<AdminProvisioningService>();
+builder.Services.AddScoped<ClientAuthenticationFilter>();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddLocalization();
 builder.Services.AddControllers();
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews()
+    .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
+    .AddDataAnnotationsLocalization(options =>
+    {
+        options.DataAnnotationLocalizerProvider = (_, factory) => factory.Create(typeof(Web.Resources));
+    });
 builder.Services.AddRazorPages(options =>
 {
     options.Conventions.AuthorizeAreaFolder("Admin", "/", "AdminArea");
+}).AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
+    .AddDataAnnotationsLocalization(options =>
+    {
+        options.DataAnnotationLocalizerProvider = (_, factory) => factory.Create(typeof(Web.Resources));
 });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddAuthorizationBuilder()
@@ -80,6 +117,56 @@ builder.Services.AddAuthorizationBuilder()
         policy.AuthenticationSchemes.Add(IdentityConstants.ApplicationScheme);
         policy.RequireRole("Admin");
     });
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.OnRejected = async (context, cancellationToken) =>
+    {
+        if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
+        {
+            context.HttpContext.Response.Headers.RetryAfter =
+                ((int)retryAfter.TotalSeconds).ToString(NumberFormatInfo.InvariantInfo);
+        }
+
+        context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+        await context.HttpContext.Response.WriteAsJsonAsync(
+            new { error = "TooManyRequests" },
+            cancellationToken);
+    };
+
+    options.AddPolicy("default", context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 60,
+                Window = TimeSpan.FromSeconds(60),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0
+            }));
+
+    options.AddPolicy("auth-strict", context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 10,
+                Window = TimeSpan.FromSeconds(60),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0
+            }));
+
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 60,
+                Window = TimeSpan.FromSeconds(60),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0
+            }));
+});
 
 var authenticationBuilder = builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -142,6 +229,13 @@ builder.Services.AddSwaggerGen(options =>
         In = ParameterLocation.Header,
         Description = "Enter: Bearer {your JWT token}"
     });
+    options.AddSecurityDefinition("ClientCredentials", new OpenApiSecurityScheme
+    {
+        Type = SecuritySchemeType.ApiKey,
+        In = ParameterLocation.Header,
+        Name = "X-Client-Id",
+        Description = "Client application credentials. Also requires X-Client-Secret header."
+    });
     options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
     {
         {
@@ -149,6 +243,7 @@ builder.Services.AddSwaggerGen(options =>
             []
         }
     });
+    options.OperationFilter<ClientCredentialsOperationFilter>();
 
     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
@@ -159,6 +254,13 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 var app = builder.Build();
+
+var supportedCultures = new[]
+{
+    new CultureInfo("en-US"),
+    new CultureInfo("et-EE"),
+    new CultureInfo("fi-FI")
+};
 
 app.UseForwardedHeaders();
 
@@ -174,6 +276,14 @@ else
 
 app.UseHttpsRedirection();
 app.UseRouting();
+app.UseRateLimiter();
+
+app.UseRequestLocalization(new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture("en-US"),
+    SupportedCultures = supportedCultures,
+    SupportedUICultures = supportedCultures
+});
 
 app.UseSwagger();
 app.UseSwaggerUI(options =>

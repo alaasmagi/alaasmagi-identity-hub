@@ -5,6 +5,7 @@ using Application.Consent.Responses;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Web.Contracts.Requests;
 using Web.Contracts.Responses;
 
@@ -51,9 +52,11 @@ public sealed class ConsentController : ApiControllerBase
     /// <returns>The consent response.</returns>
     [HttpPost]
     [AllowAnonymous]
+    [EnableRateLimiting("auth-strict")]
     [ProducesResponseType(typeof(ConsentResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> GrantConsent([FromBody] GrantConsentApiRequest request)
     {
         var payload = TokenPayloads.Unprotect<ConsentTokenPayload>(request.ConsentToken);

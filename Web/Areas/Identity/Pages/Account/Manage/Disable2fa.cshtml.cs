@@ -34,14 +34,14 @@ public class Disable2faModel : PageModel
     {
         return AccountFlow.TryGetUserId(User, out _)
             ? Page()
-            : NotFound("Unable to load the current user.");
+            : NotFound(AccountFlow.Text(this, "Unable to load the current user."));
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
         if (!AccountFlow.TryGetUserId(User, out var userId))
         {
-            return NotFound("Unable to load the current user.");
+            return NotFound(AccountFlow.Text(this, "Unable to load the current user."));
         }
 
         if (!ModelState.IsValid)
@@ -53,11 +53,11 @@ public class Disable2faModel : PageModel
         var result = await _twoFactorService.DisableTwoFactorAsync(new DisableTwoFactorRequest(userId, code));
         if (!result.IsSuccess)
         {
-            ModelState.AddModelError(string.Empty, AccountFlow.ToDisplayError(result.Error));
+            ModelState.AddModelError(string.Empty, AccountFlow.ToDisplayError(this, result.Error));
             return Page();
         }
 
-        StatusMessage = "2FA has been disabled. You can reenable 2FA when you set up an authenticator app.";
+        StatusMessage = AccountFlow.Text(this, "2FA has been disabled. You can reenable 2FA when you set up an authenticator app.");
         return RedirectToPage("./TwoFactorAuthentication");
     }
 }

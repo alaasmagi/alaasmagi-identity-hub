@@ -40,7 +40,7 @@ public class ConsentModel : PageModel
     {
         if (!AccountFlow.TryGetUserId(User, out var userId))
         {
-            ModelState.AddModelError(string.Empty, "The consent request requires a signed-in user.");
+            ModelState.AddModelError(string.Empty, AccountFlow.Text(this, "The consent request requires a signed-in user."));
             await LoadConsentInfoAsync();
             return Page();
         }
@@ -52,12 +52,12 @@ public class ConsentModel : PageModel
         if (!result.IsSuccess || result.Value is null)
         {
             Message = result.Error == "NotInvited"
-                ? "You are not invited to access this application."
+                ? AccountFlow.Text(this, "You are not invited to access this application.")
                 : null;
 
             if (Message is null)
             {
-                ModelState.AddModelError(string.Empty, AccountFlow.ToDisplayError(result.Error));
+                ModelState.AddModelError(string.Empty, AccountFlow.ToDisplayError(this, result.Error));
             }
 
             await LoadConsentInfoAsync();
@@ -66,7 +66,7 @@ public class ConsentModel : PageModel
 
         if (result.Value.Status == EUserClientStatus.Pending)
         {
-            Message = "Your access request is waiting for administrator approval.";
+            Message = AccountFlow.Text(this, "Your access request is waiting for administrator approval.");
             await LoadConsentInfoAsync();
             return Page();
         }
@@ -83,14 +83,14 @@ public class ConsentModel : PageModel
     {
         if (string.IsNullOrWhiteSpace(ConsentToken))
         {
-            ModelState.AddModelError(string.Empty, "The consent request is no longer valid.");
+            ModelState.AddModelError(string.Empty, AccountFlow.Text(this, "The consent request is no longer valid."));
             return;
         }
 
         var result = await _consentService.GetConsentInfoAsync(ConsentToken);
         if (!result.IsSuccess || result.Value is null)
         {
-            ModelState.AddModelError(string.Empty, AccountFlow.ToDisplayError(result.Error));
+            ModelState.AddModelError(string.Empty, AccountFlow.ToDisplayError(this, result.Error));
             return;
         }
 

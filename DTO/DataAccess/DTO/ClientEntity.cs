@@ -11,6 +11,8 @@ public class ClientEntity : BaseEntityWithMetaConcurrency
     public string? AllowedOrigins { get; set; }
     public bool IsActive { get; set; }
     public ERegistrationType RegistrationType { get; set; }
+    public Guid? DefaultRoleId { get; set; }
+    public AppRoleEntity? DefaultRole { get; set; }
 
     public ICollection<AppUserClientEntity>? UserClients { get; set; }
     public ICollection<AppRoleEntity>? Roles { get; set; }

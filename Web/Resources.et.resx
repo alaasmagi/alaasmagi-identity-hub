@@ -1,0 +1,699 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="2FA has been disabled. You can reenable 2FA when you set up an authenticator app." xml:space="preserve">
+    <value>2FA on keelatud. Saad 2FA uuesti lubada, kui seadistad autentimisrakenduse.</value>
+  </data>
+  <data name="A user id and token must be supplied for password reset." xml:space="preserve">
+    <value>Parooli lähtestamiseks tuleb esitada kasutaja ID ja token.</value>
+  </data>
+  <data name="Active" xml:space="preserve">
+    <value>Aktiivne</value>
+  </data>
+  <data name="Add authenticator app" xml:space="preserve">
+    <value>Lisa autentimisrakendus</value>
+  </data>
+  <data name="Allowed Origins" xml:space="preserve">
+    <value>Lubatud lähtekohad</value>
+  </data>
+  <data name="An error occurred while processing your request." xml:space="preserve">
+    <value>Päringu töötlemisel tekkis viga.</value>
+  </data>
+  <data name="ApplicationName" xml:space="preserve">
+    <value>Identiteedikeskus</value>
+  </data>
+  <data name="Approve" xml:space="preserve">
+    <value>Kinnita</value>
+  </data>
+  <data name="Are you sure you want to delete this client?" xml:space="preserve">
+    <value>Kas oled kindel, et soovid selle kliendi kustutada?</value>
+  </data>
+  <data name="Are you sure you want to delete this role?" xml:space="preserve">
+    <value>Kas oled kindel, et soovid selle rolli kustutada?</value>
+  </data>
+  <data name="Authenticator app" xml:space="preserve">
+    <value>Autentimisrakendus</value>
+  </data>
+  <data name="Authenticator code" xml:space="preserve">
+    <value>Autentimiskood</value>
+  </data>
+  <data name="Authorize application" xml:space="preserve">
+    <value>Autoriseeri rakendus</value>
+  </data>
+  <data name="AuthorizeApplicationMessage" xml:space="preserve">
+    <value>{0} soovib juurdepääsu sinu kontole.</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>Tagasi</value>
+  </data>
+  <data name="Back to Clients" xml:space="preserve">
+    <value>Tagasi klientide juurde</value>
+  </data>
+  <data name="Back to List" xml:space="preserve">
+    <value>Tagasi nimekirja</value>
+  </data>
+  <data name="Back to sign in" xml:space="preserve">
+    <value>Tagasi sisselogimisse</value>
+  </data>
+  <data name="Back to users" xml:space="preserve">
+    <value>Tagasi kasutajate juurde</value>
+  </data>
+  <data name="Ban" xml:space="preserve">
+    <value>Blokeeri</value>
+  </data>
+  <data name="Ban user" xml:space="preserve">
+    <value>Blokeeri kasutaja</value>
+  </data>
+  <data name="Banned" xml:space="preserve">
+    <value>Blokeeritud</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Tühista</value>
+  </data>
+  <data name="Change password" xml:space="preserve">
+    <value>Muuda parooli</value>
+  </data>
+  <data name="Change your account settings" xml:space="preserve">
+    <value>Muuda konto seadeid</value>
+  </data>
+  <data name="Client" xml:space="preserve">
+    <value>Klient</value>
+  </data>
+  <data name="Client Details" xml:space="preserve">
+    <value>Kliendi üksikasjad</value>
+  </data>
+  <data name="Client ID" xml:space="preserve">
+    <value>Kliendi ID</value>
+  </data>
+  <data name="Client ID:" xml:space="preserve">
+    <value>Kliendi ID:</value>
+  </data>
+  <data name="Client Secret:" xml:space="preserve">
+    <value>Kliendi saladus:</value>
+  </data>
+  <data name="Client secret shown once." xml:space="preserve">
+    <value>Kliendi saladust näidatakse üks kord.</value>
+  </data>
+  <data name="Clients" xml:space="preserve">
+    <value>Kliendid</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Sulge</value>
+  </data>
+  <data name="Configure authenticator app" xml:space="preserve">
+    <value>Seadista autentimisrakendus</value>
+  </data>
+  <data name="Confirm" xml:space="preserve">
+    <value>Kinnita</value>
+  </data>
+  <data name="Confirm Password" xml:space="preserve">
+    <value>Kinnita parool</value>
+  </data>
+  <data name="Confirm email" xml:space="preserve">
+    <value>Kinnita e-post</value>
+  </data>
+  <data name="Confirm new password" xml:space="preserve">
+    <value>Kinnita uus parool</value>
+  </data>
+  <data name="Confirm your email address before signing in." xml:space="preserve">
+    <value>Kinnita oma e-posti aadress enne sisselogimist.</value>
+  </data>
+  <data name="Create" xml:space="preserve">
+    <value>Loo</value>
+  </data>
+  <data name="Create Client" xml:space="preserve">
+    <value>Loo klient</value>
+  </data>
+  <data name="Create New" xml:space="preserve">
+    <value>Loo uus</value>
+  </data>
+  <data name="Create Role" xml:space="preserve">
+    <value>Loo roll</value>
+  </data>
+  <data name="Create a new account." xml:space="preserve">
+    <value>Loo uus konto.</value>
+  </data>
+  <data name="CreateAccountToContinueTo" xml:space="preserve">
+    <value>Jätkamiseks rakendusse {0} loo konto.</value>
+  </data>
+  <data name="Current password" xml:space="preserve">
+    <value>Praegune parool</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Kustuta</value>
+  </data>
+  <data name="Delete Client" xml:space="preserve">
+    <value>Kustuta klient</value>
+  </data>
+  <data name="Delete Role" xml:space="preserve">
+    <value>Kustuta roll</value>
+  </data>
+  <data name="Deny" xml:space="preserve">
+    <value>Keela</value>
+  </data>
+  <data name="Details" xml:space="preserve">
+    <value>Üksikasjad</value>
+  </data>
+  <data name="Development Mode" xml:space="preserve">
+    <value>Arendusrežiim</value>
+  </data>
+  <data name="Disable 2FA" xml:space="preserve">
+    <value>Keela 2FA</value>
+  </data>
+  <data name="Disable two-factor authentication (2FA)" xml:space="preserve">
+    <value>Keela kaheastmeline autentimine (2FA)</value>
+  </data>
+  <data name="Disabling 2FA does not change the keys used in authenticator apps." xml:space="preserve">
+    <value>2FA keelamine ei muuda autentimisrakendustes kasutatavaid võtmeid.</value>
+  </data>
+  <data name="Don't have access to your authenticator device? You can" xml:space="preserve">
+    <value>Puudub juurdepääs autentimisseadmele? Saad</value>
+  </data>
+  <data name="Download a two-factor authenticator app like Microsoft Authenticator for" xml:space="preserve">
+    <value>Laadi alla kaheastmelise autentimise rakendus, näiteks Microsoft Authenticator platvormile</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Muuda</value>
+  </data>
+  <data name="Edit Client" xml:space="preserve">
+    <value>Muuda klienti</value>
+  </data>
+  <data name="Edit Role" xml:space="preserve">
+    <value>Muuda rolli</value>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>E-post</value>
+  </data>
+  <data name="Enter your email." xml:space="preserve">
+    <value>Sisesta oma e-post.</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Viga</value>
+  </data>
+  <data name="Error confirming your email." xml:space="preserve">
+    <value>E-posti kinnitamisel tekkis viga.</value>
+  </data>
+  <data name="Error from external provider:" xml:space="preserve">
+    <value>Viga väliselt teenusepakkujalt:</value>
+  </data>
+  <data name="Error." xml:space="preserve">
+    <value>Viga.</value>
+  </data>
+  <data name="External login" xml:space="preserve">
+    <value>Väline sisselogimine</value>
+  </data>
+  <data name="External login is being processed." xml:space="preserve">
+    <value>Välist sisselogimist töödeldakse.</value>
+  </data>
+  <data name="External logins" xml:space="preserve">
+    <value>Välised sisselogimised</value>
+  </data>
+  <data name="External registration" xml:space="preserve">
+    <value>Väline registreerimine</value>
+  </data>
+  <data name="External sign-in" xml:space="preserve">
+    <value>Väline sisselogimine</value>
+  </data>
+  <data name="Filter" xml:space="preserve">
+    <value>Filtreeri</value>
+  </data>
+  <data name="For local debugging, enable the" xml:space="preserve">
+    <value>Kohalikuks silumiseks luba</value>
+  </data>
+  <data name="Forget this browser" xml:space="preserve">
+    <value>Unusta see brauser</value>
+  </data>
+  <data name="Forgot password confirmation" xml:space="preserve">
+    <value>Parooli lähtestamise kinnitus</value>
+  </data>
+  <data name="Forgot your password?" xml:space="preserve">
+    <value>Unustasid parooli?</value>
+  </data>
+  <data name="Full name" xml:space="preserve">
+    <value>Täisnimi</value>
+  </data>
+  <data name="Generate Recovery Codes" xml:space="preserve">
+    <value>Genereeri taastekoodid</value>
+  </data>
+  <data name="Generate two-factor authentication (2FA) recovery codes" xml:space="preserve">
+    <value>Genereeri 2FA taastekoodid</value>
+  </data>
+  <data name="Generating new recovery codes does not change the keys used in authenticator apps." xml:space="preserve">
+    <value>Uute taastekoodide genereerimine ei muuda autentimisrakendustes kasutatavaid võtmeid.</value>
+  </data>
+  <data name="Granted at" xml:space="preserve">
+    <value>Antud</value>
+  </data>
+  <data name="HelloUser" xml:space="preserve">
+    <value>Tere, {0}!</value>
+  </data>
+  <data name="Home" xml:space="preserve">
+    <value>Avaleht</value>
+  </data>
+  <data name="Home Page" xml:space="preserve">
+    <value>Avaleht</value>
+  </data>
+  <data name="IP address" xml:space="preserve">
+    <value>IP-aadress</value>
+  </data>
+  <data name="If email delivery is not configured, the confirmation URL is written to the application log." xml:space="preserve">
+    <value>Kui e-posti saatmine pole seadistatud, kirjutatakse kinnituslink rakenduse logisse.</value>
+  </data>
+  <data name="If email delivery is not configured, the confirmation token is written to the application log." xml:space="preserve">
+    <value>Kui e-posti saatmine pole seadistatud, kirjutatakse kinnitustoken rakenduse logisse.</value>
+  </data>
+  <data name="If you lose your device and don't have the recovery codes you will lose access to your account." xml:space="preserve">
+    <value>Kui kaotad seadme ja sul pole taastekoode, kaotad juurdepääsu oma kontole.</value>
+  </data>
+  <data name="If you wish to change the key used in an authenticator app you should" xml:space="preserve">
+    <value>Kui soovid muuta autentimisrakenduses kasutatavat võtit, peaksid</value>
+  </data>
+  <data name="Invalid external login request." xml:space="preserve">
+    <value>Vigane väline sisselogimispäring.</value>
+  </data>
+  <data name="Invalid login attempt." xml:space="preserve">
+    <value>Vigane sisselogimiskatse.</value>
+  </data>
+  <data name="It can result in displaying sensitive information from exceptions to end users." xml:space="preserve">
+    <value>See võib kuvada lõppkasutajatele erinditest pärinevat tundlikku teavet.</value>
+  </data>
+  <data name="Learn about" xml:space="preserve">
+    <value>Loe teemal</value>
+  </data>
+  <data name="Learn how to" xml:space="preserve">
+    <value>Vaata, kuidas</value>
+  </data>
+  <data name="Log in" xml:space="preserve">
+    <value>Logi sisse</value>
+  </data>
+  <data name="LogInUsingProvider" xml:space="preserve">
+    <value>Logi sisse oma {0} kontoga</value>
+  </data>
+  <data name="Login" xml:space="preserve">
+    <value>Logi sisse</value>
+  </data>
+  <data name="Logout" xml:space="preserve">
+    <value>Logi välja</value>
+  </data>
+  <data name="Manage" xml:space="preserve">
+    <value>Halda</value>
+  </data>
+  <data name="Manage your account" xml:space="preserve">
+    <value>Halda oma kontot</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Nimi</value>
+  </data>
+  <data name="New client secret shown once." xml:space="preserve">
+    <value>Uut kliendi saladust näidatakse üks kord.</value>
+  </data>
+  <data name="New password" xml:space="preserve">
+    <value>Uus parool</value>
+  </data>
+  <data name="Once you have scanned the QR code or input the key above, your two factor authentication app will provide you with a unique code. Enter the code in the confirmation box below." xml:space="preserve">
+    <value>Kui oled QR-koodi skanninud või ülal oleva võtme sisestanud, annab autentimisrakendus sulle kordumatu koodi. Sisesta kood allolevasse kinnituskasti.</value>
+  </data>
+  <data name="Open registration from a registered client application to use Google or Microsoft." xml:space="preserve">
+    <value>Google'i või Microsofti kasutamiseks ava registreerimine registreeritud kliendirakendusest.</value>
+  </data>
+  <data name="Open sign-in from a registered client application to use Google or Microsoft." xml:space="preserve">
+    <value>Google'i või Microsofti kasutamiseks ava sisselogimine registreeritud kliendirakendusest.</value>
+  </data>
+  <data name="Open sign-in from a registered client application." xml:space="preserve">
+    <value>Ava sisselogimine registreeritud kliendirakendusest.</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Parool</value>
+  </data>
+  <data name="Personal data" xml:space="preserve">
+    <value>Isikuandmed</value>
+  </data>
+  <data name="Please check your email to confirm your account." xml:space="preserve">
+    <value>Konto kinnitamiseks kontrolli oma e-posti.</value>
+  </data>
+  <data name="Please check your email to reset your password." xml:space="preserve">
+    <value>Parooli lähtestamiseks kontrolli oma e-posti.</value>
+  </data>
+  <data name="Privacy" xml:space="preserve">
+    <value>Privaatsus</value>
+  </data>
+  <data name="Privacy Policy" xml:space="preserve">
+    <value>Privaatsuspoliitika</value>
+  </data>
+  <data name="Privacy and cookie policy have not been accepted." xml:space="preserve">
+    <value>Privaatsus- ja küpsisepoliitikaga pole nõustutud.</value>
+  </data>
+  <data name="Profile" xml:space="preserve">
+    <value>Profiil</value>
+  </data>
+  <data name="Put these codes in a safe place." xml:space="preserve">
+    <value>Pane need koodid turvalisse kohta.</value>
+  </data>
+  <data name="Reason" xml:space="preserve">
+    <value>Põhjus</value>
+  </data>
+  <data name="Recovery Code" xml:space="preserve">
+    <value>Taastekood</value>
+  </data>
+  <data name="Recovery code verification" xml:space="preserve">
+    <value>Taastekoodi kontroll</value>
+  </data>
+  <data name="Recovery codes" xml:space="preserve">
+    <value>Taastekoodid</value>
+  </data>
+  <data name="RecoveryCodeLoginExplanation" xml:space="preserve">
+    <value>Soovisid sisse logida taastekoodiga. Seda sisselogimist ei mäletata enne, kui sisestad sisselogimisel autentimisrakenduse koodi või keelad 2FA ja logid uuesti sisse.</value>
+  </data>
+  <data name="RecoveryCodesLeftMessage" xml:space="preserve">
+    <value>Sul on järel {0} taastekoodi.</value>
+  </data>
+  <data name="Regenerate Secret" xml:space="preserve">
+    <value>Genereeri saladus uuesti</value>
+  </data>
+  <data name="Register" xml:space="preserve">
+    <value>Registreeru</value>
+  </data>
+  <data name="Register as a new user" xml:space="preserve">
+    <value>Registreeru uue kasutajana</value>
+  </data>
+  <data name="Register confirmation" xml:space="preserve">
+    <value>Registreerimise kinnitus</value>
+  </data>
+  <data name="Registration Type" xml:space="preserve">
+    <value>Registreerimise tüüp</value>
+  </data>
+  <data name="Registration type:" xml:space="preserve">
+    <value>Registreerimise tüüp:</value>
+  </data>
+  <data name="Remember me?" xml:space="preserve">
+    <value>Jäta mind meelde?</value>
+  </data>
+  <data name="Remember this machine" xml:space="preserve">
+    <value>Jäta see seade meelde</value>
+  </data>
+  <data name="Request ID:" xml:space="preserve">
+    <value>Päringu ID:</value>
+  </data>
+  <data name="Resend email confirmation" xml:space="preserve">
+    <value>Saada e-posti kinnitus uuesti</value>
+  </data>
+  <data name="Reset" xml:space="preserve">
+    <value>Lähtesta</value>
+  </data>
+  <data name="Reset authenticator app" xml:space="preserve">
+    <value>Lähtesta autentimisrakendus</value>
+  </data>
+  <data name="Reset password" xml:space="preserve">
+    <value>Lähtesta parool</value>
+  </data>
+  <data name="Reset password confirmation" xml:space="preserve">
+    <value>Parooli lähtestamise kinnitus</value>
+  </data>
+  <data name="Reset recovery codes" xml:space="preserve">
+    <value>Lähtesta taastekoodid</value>
+  </data>
+  <data name="Reset your password." xml:space="preserve">
+    <value>Lähtesta oma parool.</value>
+  </data>
+  <data name="Revoked at" xml:space="preserve">
+    <value>Tühistatud</value>
+  </data>
+  <data name="Role Details" xml:space="preserve">
+    <value>Rolli üksikasjad</value>
+  </data>
+  <data name="Roles" xml:space="preserve">
+    <value>Rollid</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Salvesta</value>
+  </data>
+  <data name="Scan the QR Code or enter this key" xml:space="preserve">
+    <value>Skanni QR-kood või sisesta see võti</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Otsi</value>
+  </data>
+  <data name="Search users" xml:space="preserve">
+    <value>Otsi kasutajaid</value>
+  </data>
+  <data name="Security Events" xml:space="preserve">
+    <value>Turvasündmused</value>
+  </data>
+  <data name="Send confirmation" xml:space="preserve">
+    <value>Saada kinnitus</value>
+  </data>
+  <data name="Set up authenticator app" xml:space="preserve">
+    <value>Seadista autentimisrakendus</value>
+  </data>
+  <data name="SignInToContinueTo" xml:space="preserve">
+    <value>Jätkamiseks rakendusse {0} logi sisse.</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>Olek</value>
+  </data>
+  <data name="Store it now; it cannot be viewed again." xml:space="preserve">
+    <value>Salvesta see kohe; seda ei saa enam uuesti vaadata.</value>
+  </data>
+  <data name="Swapping to" xml:space="preserve">
+    <value>Üleminek</value>
+  </data>
+  <data name="Thank you for confirming your email." xml:space="preserve">
+    <value>Täname e-posti kinnitamise eest.</value>
+  </data>
+  <data name="The Development environment shouldn't be enabled for deployed applications." xml:space="preserve">
+    <value>Development-keskkonda ei tohiks juurutatud rakendustes lubada.</value>
+  </data>
+  <data name="The authentication flow could not be completed." xml:space="preserve">
+    <value>Autentimisvoogu ei saanud lõpule viia.</value>
+  </data>
+  <data name="The consent request is no longer valid." xml:space="preserve">
+    <value>Nõusolekupäring ei kehti enam.</value>
+  </data>
+  <data name="The consent request requires a signed-in user." xml:space="preserve">
+    <value>Nõusolekupäring nõuab sisselogitud kasutajat.</value>
+  </data>
+  <data name="The new password and confirmation password do not match." xml:space="preserve">
+    <value>Uus parool ja kinnitusparool ei kattu.</value>
+  </data>
+  <data name="The password and confirmation password do not match." xml:space="preserve">
+    <value>Parool ja kinnitusparool ei kattu.</value>
+  </data>
+  <data name="The recovery code is invalid." xml:space="preserve">
+    <value>Taastekood on vigane.</value>
+  </data>
+  <data name="The request could not be completed." xml:space="preserve">
+    <value>Päringut ei saanud lõpule viia.</value>
+  </data>
+  <data name="The return address is not valid for this application." xml:space="preserve">
+    <value>Tagasipöördumise aadress ei sobi selle rakenduse jaoks.</value>
+  </data>
+  <data name="The two-factor login request is no longer valid." xml:space="preserve">
+    <value>Kaheastmelise sisselogimise päring ei kehti enam.</value>
+  </data>
+  <data name="The verification code is invalid." xml:space="preserve">
+    <value>Kinnituskood on vigane.</value>
+  </data>
+  <data name="The {0} must be at least {2} and at max {1} characters long." xml:space="preserve">
+    <value>{0} peab olema vähemalt {2} ja kuni {1} tähemärki pikk.</value>
+  </data>
+  <data name="This action only disables 2FA." xml:space="preserve">
+    <value>See toiming keelab ainult 2FA.</value>
+  </data>
+  <data name="This application" xml:space="preserve">
+    <value>See rakendus</value>
+  </data>
+  <data name="Timestamp" xml:space="preserve">
+    <value>Ajatempel</value>
+  </data>
+  <data name="To use an authenticator app go through the following steps:" xml:space="preserve">
+    <value>Autentimisrakenduse kasutamiseks järgi neid samme:</value>
+  </data>
+  <data name="Toggle navigation" xml:space="preserve">
+    <value>Ava või sulge navigeerimine</value>
+  </data>
+  <data name="Two-factor authentication" xml:space="preserve">
+    <value>Kaheastmeline autentimine</value>
+  </data>
+  <data name="Two-factor authentication (2FA)" xml:space="preserve">
+    <value>Kaheastmeline autentimine (2FA)</value>
+  </data>
+  <data name="Type" xml:space="preserve">
+    <value>Tüüp</value>
+  </data>
+  <data name="Unable to load authenticator setup." xml:space="preserve">
+    <value>Autentimisrakenduse seadistust ei saanud laadida.</value>
+  </data>
+  <data name="Unable to load the current user." xml:space="preserve">
+    <value>Praegust kasutajat ei saanud laadida.</value>
+  </data>
+  <data name="Unable to load two-factor status." xml:space="preserve">
+    <value>2FA olekut ei saanud laadida.</value>
+  </data>
+  <data name="Unban" xml:space="preserve">
+    <value>Eemalda blokeering</value>
+  </data>
+  <data name="Unban user" xml:space="preserve">
+    <value>Eemalda kasutaja blokeering</value>
+  </data>
+  <data name="Update password" xml:space="preserve">
+    <value>Uuenda parooli</value>
+  </data>
+  <data name="Use a local account to log in." xml:space="preserve">
+    <value>Logi sisse kohaliku kontoga.</value>
+  </data>
+  <data name="Use another service to log in." xml:space="preserve">
+    <value>Logi sisse teise teenusega.</value>
+  </data>
+  <data name="Use another service to register." xml:space="preserve">
+    <value>Registreeru teise teenusega.</value>
+  </data>
+  <data name="Use this page to detail your site's privacy policy." xml:space="preserve">
+    <value>Kasuta seda lehte saidi privaatsuspoliitika kirjeldamiseks.</value>
+  </data>
+  <data name="User" xml:space="preserve">
+    <value>Kasutaja</value>
+  </data>
+  <data name="User Clients" xml:space="preserve">
+    <value>Kasutaja kliendid</value>
+  </data>
+  <data name="User ID" xml:space="preserve">
+    <value>Kasutaja ID</value>
+  </data>
+  <data name="User agent" xml:space="preserve">
+    <value>Kasutajaagent</value>
+  </data>
+  <data name="Users" xml:space="preserve">
+    <value>Kasutajad</value>
+  </data>
+  <data name="Verification Code" xml:space="preserve">
+    <value>Kinnituskood</value>
+  </data>
+  <data name="Verify" xml:space="preserve">
+    <value>Kontrolli</value>
+  </data>
+  <data name="View Clients" xml:space="preserve">
+    <value>Vaata kliente</value>
+  </data>
+  <data name="Welcome" xml:space="preserve">
+    <value>Tere tulemast</value>
+  </data>
+  <data name="You are not invited to access this application." xml:space="preserve">
+    <value>Sind pole kutsutud sellele rakendusele ligi pääsema.</value>
+  </data>
+  <data name="You can" xml:space="preserve">
+    <value>Saad</value>
+  </data>
+  <data name="You have 1 recovery code left." xml:space="preserve">
+    <value>Sul on järel 1 taastekood.</value>
+  </data>
+  <data name="You have generated new recovery codes." xml:space="preserve">
+    <value>Genereerisid uued taastekoodid.</value>
+  </data>
+  <data name="You have no recovery codes left." xml:space="preserve">
+    <value>Sul pole ühtegi taastekoodi järel.</value>
+  </data>
+  <data name="You must" xml:space="preserve">
+    <value>Pead</value>
+  </data>
+  <data name="You must accept the policy before you can enable two factor authentication." xml:space="preserve">
+    <value>Enne kaheastmelise autentimise lubamist pead poliitikaga nõustuma.</value>
+  </data>
+  <data name="You should" xml:space="preserve">
+    <value>Peaksid</value>
+  </data>
+  <data name="Your access is waiting for administrator approval." xml:space="preserve">
+    <value>Sinu juurdepääs ootab administraatori kinnitust.</value>
+  </data>
+  <data name="Your access request is waiting for administrator approval." xml:space="preserve">
+    <value>Sinu juurdepääsutaotlus ootab administraatori kinnitust.</value>
+  </data>
+  <data name="Your access to this application has been revoked." xml:space="preserve">
+    <value>Sinu juurdepääs sellele rakendusele on tühistatud.</value>
+  </data>
+  <data name="Your authenticator app has been verified." xml:space="preserve">
+    <value>Sinu autentimisrakendus on kinnitatud.</value>
+  </data>
+  <data name="Your login is protected with an authenticator app. Enter your authenticator code below." xml:space="preserve">
+    <value>Sinu sisselogimine on kaitstud autentimisrakendusega. Sisesta allpool autentimiskood.</value>
+  </data>
+  <data name="Your password has been changed." xml:space="preserve">
+    <value>Sinu parool on muudetud.</value>
+  </data>
+  <data name="Your password has been reset. Please" xml:space="preserve">
+    <value>Sinu parool on lähtestatud. Palun</value>
+  </data>
+  <data name="and" xml:space="preserve">
+    <value>ja</value>
+  </data>
+  <data name="and restarting the app." xml:space="preserve">
+    <value>ja taaskäivitades rakenduse.</value>
+  </data>
+  <data name="before you can log in with a recovery code." xml:space="preserve">
+    <value>enne kui saad taastekoodiga sisse logida.</value>
+  </data>
+  <data name="building Web apps with ASP.NET Core" xml:space="preserve">
+    <value>ASP.NET Core veebirakenduste loomine</value>
+  </data>
+  <data name="click here to log in" xml:space="preserve">
+    <value>klõpsa siia sisselogimiseks</value>
+  </data>
+  <data name="enable QR code generation" xml:space="preserve">
+    <value>lubada QR-koodi genereerimine</value>
+  </data>
+  <data name="environment by setting the" xml:space="preserve">
+    <value>keskkond, määrates</value>
+  </data>
+  <data name="environment variable to" xml:space="preserve">
+    <value>keskkonnamuutuja väärtuseks</value>
+  </data>
+  <data name="environment will display more detailed information about the error that occurred." xml:space="preserve">
+    <value>keskkonnale kuvab tekkinud vea kohta täpsemat teavet.</value>
+  </data>
+  <data name="for" xml:space="preserve">
+    <value>platvormile</value>
+  </data>
+  <data name="generate a new set of recovery codes" xml:space="preserve">
+    <value>genereerida uue taastekoodide komplekti</value>
+  </data>
+  <data name="into your two factor authenticator app. Spaces and casing do not matter." xml:space="preserve">
+    <value>oma kaheastmelise autentimise rakendusse. Tühikud ja tähesuurus pole olulised.</value>
+  </data>
+  <data name="log in with a recovery code" xml:space="preserve">
+    <value>logida sisse taastekoodiga</value>
+  </data>
+  <data name="or" xml:space="preserve">
+    <value>või</value>
+  </data>
+  <data name="reset your authenticator keys." xml:space="preserve">
+    <value>lähtestama autentimisvõtmed.</value>
+  </data>
+  <data name="Please confirm your new password." xml:space="preserve">
+    <value>Palun kinnita oma uus parool.</value>
+  </data>
+  <data name="Please confirm your password." xml:space="preserve">
+    <value>Palun kinnita oma parool.</value>
+  </data>
+  <data name="Please enter the code." xml:space="preserve">
+    <value>Palun sisesta kood.</value>
+  </data>
+  <data name="Please enter your new password." xml:space="preserve">
+    <value>Palun sisesta oma uus parool.</value>
+  </data>
+  <data name="Please enter your old password." xml:space="preserve">
+    <value>Palun sisesta oma praegune parool.</value>
+  </data>
+  <data name="Please enter your password." xml:space="preserve">
+    <value>Palun sisesta oma parool.</value>
+  </data>
+</root>

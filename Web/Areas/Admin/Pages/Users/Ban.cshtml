@@ -1,7 +1,7 @@
 @page
 @model Web.Areas.Admin.Pages.Users.BanModel
 @{
-    ViewData["Title"] = Model.IsBanned ? "Unban user" : "Ban user";
+    ViewData["Title"] = Model.IsBanned ? L["Unban user"] : L["Ban user"];
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -13,15 +13,13 @@
     @if (!Model.IsBanned)
     {
         <div class="form-floating mb-3">
-            <input asp-for="Reason" class="form-control" placeholder="Reason" />
+            <input asp-for="Reason" class="form-control" placeholder="@L["Reason"]" />
             <label asp-for="Reason" class="form-label"></label>
             <span asp-validation-for="Reason" class="text-danger"></span>
         </div>
     }
-    <button type="submit" class="btn btn-primary">Confirm</button>
-    <a asp-page="./Index" class="btn btn-outline-secondary">Cancel</a>
+    <button type="submit" class="btn btn-primary">@L["Confirm"]</button>
+    <a asp-page="./Index" class="btn btn-outline-secondary">@L["Cancel"]</a>
 </form>
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
+<partial name="_ValidationScriptsPartial" />

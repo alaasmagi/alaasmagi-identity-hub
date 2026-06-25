@@ -26,7 +26,7 @@ Every request DTO accepted by an Application service method SHALL have a FluentV
 - **THEN** the method returns `Result<T>.Failure(...)` and does not throw an exception for the expected business failure
 
 ### Requirement: Authentication service manages local account flows
-`IAuthService` SHALL implement registration, login, refresh-token rotation, logout, email confirmation, password reset, password reset confirmation, and password change using ASP.NET Identity managers and existing infrastructure services.
+`IAuthService` SHALL implement registration, login, refresh-token rotation with configured expiry enforcement, logout, email confirmation, password reset, password reset confirmation, and password change using ASP.NET Identity managers and existing infrastructure services.
 
 #### Scenario: User registers
 - **WHEN** `RegisterAsync` receives a valid email, password, and full name
@@ -58,11 +58,15 @@ Every request DTO accepted by an Application service method SHALL have a FluentV
 
 #### Scenario: Login issues tokens for active access
 - **WHEN** a valid password login has an `Active` `AppUserClient` relationship
-- **THEN** the service issues an access token and refresh token, stores the refresh token in `AspNetUserTokens`, and logs a `Login` security event
+- **THEN** the service issues an access token using the configured access-token lifetime, stores a refresh token with configured expiry in `AspNetUserTokens`, and logs a `Login` security event
 
 #### Scenario: Refresh token rotates
-- **WHEN** `RefreshTokenAsync` receives a valid stored refresh token and the user-client relationship is still active
-- **THEN** the service invalidates the old refresh token, stores a new refresh token, returns a new access token and refresh token, and logs `TokenRefresh`
+- **WHEN** `RefreshTokenAsync` receives a valid stored refresh token that has not expired and the user-client relationship is still active
+- **THEN** the service invalidates the old refresh token, stores a new refresh token with configured expiry, returns a new access token and refresh token, and logs `TokenRefresh`
+
+#### Scenario: Expired refresh token is rejected
+- **WHEN** `RefreshTokenAsync` receives a refresh token whose stored expiry is earlier than the current UTC time
+- **THEN** the service returns `RefreshTokenExpired`, does not issue new tokens, and does not continue further refresh processing
 
 #### Scenario: Logout revokes refresh token
 - **WHEN** `LogoutAsync` receives a user id and stored refresh token
@@ -96,7 +100,7 @@ The Application layer SHALL build token and external-cookie claim data at runtim
 
 #### Scenario: Open registration grants active access
 - **WHEN** `GrantConsentAsync` receives a valid consent token for a client with `Open` registration
-- **THEN** the service creates an `Active` `AppUserClient`, records consent metadata, assigns a client-scoped default role if one exists, issues access and refresh tokens, and logs `ConsentGiven`
+- **THEN** the service creates an `Active` `AppUserClient`, records consent metadata, assigns `Client.DefaultRole` when `Client.DefaultRoleId` is set, issues access and refresh tokens, and logs `ConsentGiven`
 
 #### Scenario: Invite-only registration rejects uninvited user
 - **WHEN** `GrantConsentAsync` targets a client with `InviteOnly` registration and no existing invitation access
@@ -138,7 +142,7 @@ The Application layer SHALL build token and external-cookie claim data at runtim
 - **THEN** the service continues the same client consent and token issuance flow as password login
 
 ### Requirement: External authentication service supports federated MVC login
-`IExternalAuthService` SHALL support provider discovery, external callback handling, and auth-code exchange for external MVC applications.
+`IExternalAuthService` SHALL support provider discovery, external callback handling, and auth-code exchange for external MVC applications, validating redirect URIs against JSON-array allowed origins.
 
 #### Scenario: External providers are listed for an active client
 - **WHEN** `GetProvidersAsync` is called with an active client id
@@ -150,14 +154,18 @@ The Application layer SHALL build token and external-cookie claim data at runtim
 
 #### Scenario: External callback validates redirect URI
 - **WHEN** an external callback is ready to issue an auth code
-- **THEN** the service validates `RedirectUri` against the client's `AllowedOrigins` before generating the code
+- **THEN** the service parses `Client.AllowedOrigins` as a JSON array and requires the requested `RedirectUri` to exactly match one configured value case-insensitively
+
+#### Scenario: External callback rejects unlisted redirect URI
+- **WHEN** an external callback requests a redirect URI that is absent from the parsed allowed-origin array
+- **THEN** the service returns `RedirectUriNotAllowed` and does not generate an auth code
 
 #### Scenario: External callback follows consent rules
 - **WHEN** the external user lacks active access to the requested client
 - **THEN** the service follows the same consent, pending, and revoked access rules as local login
 
 #### Scenario: Auth code is exchanged for claims
-- **WHEN** `ExchangeAuthCodeAsync` receives a valid code, client id, and client secret matching `Client.ClientSecretHash`
+- **WHEN** `ExchangeAuthCodeAsync` receives a valid code, client id, client secret matching `Client.ClientSecretHash`, and a redirect URI allowed by the client's parsed allowed-origin array
 - **THEN** the service validates and consumes the auth code and returns runtime claims for the external MVC service to build its own cookie
 
 #### Scenario: Invalid client secret is rejected
@@ -186,4 +194,83 @@ The Application layer SHALL build token and external-cookie claim data at runtim
 #### Scenario: Security events are listed with filters
 - **WHEN** `GetSecurityEventsAsync` receives optional user id, optional client id, page, and page size
 - **THEN** the service returns a paged response of matching security events
+
+### Requirement: Client role service manages scoped role operations
+`IClientRoleService` SHALL provide role synchronization, user-role lookup, user-role replacement, and single-role removal for authenticated client services.
+
+#### Scenario: Service is resolved through dependency injection
+- **WHEN** the Application dependency-registration method is called
+- **THEN** `IClientRoleService` is registered as a scoped service with `ClientRoleService`
+
+#### Scenario: Role synchronization returns synced state
+- **WHEN** `SyncRolesAsync` succeeds for a client
+- **THEN** it returns `SyncRolesResponse` with the synced role names and the configured default role name when one is set
+
+#### Scenario: User roles are returned from client scope
+- **WHEN** `GetUserRolesAsync` succeeds for an active user-client relationship
+- **THEN** it returns `GetUserRolesResponse` with the user id and only the role names belonging to that client
+
+#### Scenario: User roles are fully replaced in client scope
+- **WHEN** `SetUserRolesAsync` succeeds
+- **THEN** it removes omitted roles and adds missing roles only within the requesting client's role scope
+
+#### Scenario: One user role is removed from client scope
+- **WHEN** `RemoveUserRoleAsync` succeeds
+- **THEN** it removes only the requested client-scoped role from the user
+
+### Requirement: Client default role is persisted
+The Application and persistence layers SHALL preserve each client's nullable default role selection.
+
+#### Scenario: Client maps default role fields
+- **WHEN** a `Client` is mapped to or from its EF entity representation
+- **THEN** `DefaultRoleId` and `DefaultRole` data required for default assignment are preserved
+
+#### Scenario: Default role FK is nullable
+- **WHEN** a default role is deleted
+- **THEN** the related client's `DefaultRoleId` is set to null rather than deleting the client
+
+### Requirement: Token lifetimes are configured globally
+The Application and Web infrastructure SHALL use one global token lifetime configuration for all clients, with no per-client override.
+
+#### Scenario: Access token uses configured lifetime
+- **WHEN** an access token is generated
+- **THEN** the token expiration is set to the current UTC time plus the configured `AccessTokenSeconds` value
+
+#### Scenario: Default token lifetimes are available
+- **WHEN** no token lifetime configuration is supplied
+- **THEN** access tokens default to 900 seconds and refresh tokens default to 604800 seconds
+
+#### Scenario: Client-specific lifetime is not used
+- **WHEN** tokens are generated for any registered client
+- **THEN** the same global configured lifetime values are used regardless of the client
+
+### Requirement: Refresh token expiry is enforced
+The Application layer SHALL persist refresh-token expiry together with the refresh-token value and reject expired refresh tokens before issuing new tokens.
+
+#### Scenario: Refresh token is stored with expiry
+- **WHEN** a refresh token is created and stored in `AspNetUserTokens`
+- **THEN** the stored token value contains JSON with the random token value and an absolute UTC expiry timestamp
+
+#### Scenario: Expired refresh token is rejected
+- **WHEN** `RefreshTokenAsync` receives a refresh token whose stored expiry is earlier than the current UTC time
+- **THEN** the service returns a failed result with `RefreshTokenExpired` before issuing new tokens
+
+#### Scenario: Valid refresh token continues normally
+- **WHEN** `RefreshTokenAsync` receives a refresh token whose stored token value matches and whose expiry is in the future
+- **THEN** the service continues the existing client/user validation and token rotation flow
+
+### Requirement: Allowed origins are parsed as JSON arrays
+The Application layer SHALL interpret `Client.AllowedOrigins` as a JSON array of URL strings while preserving the `string?` property type.
+
+#### Scenario: Allowed origins parse successfully
+- **WHEN** `Client.AllowedOrigins` contains a valid JSON array of strings
+- **THEN** redirect validation uses the parsed string values as the allowed redirect URL list
+
+#### Scenario: Empty or invalid allowed origins are denied
+- **WHEN** `Client.AllowedOrigins` is empty, whitespace, null, or invalid JSON
+- **THEN** redirect validation treats it as an empty list
+
+#### Scenario: Allowed origins are serialized
+- **WHEN** presentation code provides a list of allowed origin URLs
+- **THEN** the list is serialized to JSON before being assigned to `Client.AllowedOrigins`
 

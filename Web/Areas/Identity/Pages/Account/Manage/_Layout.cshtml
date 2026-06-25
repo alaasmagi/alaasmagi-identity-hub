@@ -1,4 +1,5 @@
-﻿@{
+﻿@inherits Microsoft.AspNetCore.Mvc.Razor.RazorPage<dynamic>
+@{
     if (ViewData.TryGetValue("ParentLayout", out var parentLayout) && parentLayout !=  null)
     {
         Layout = parentLayout.ToString();
@@ -9,10 +10,10 @@
     }
 }
 
-<h1>Manage your account</h1>
+<h1>@L["Manage your account"]</h1>
 
 <div>
-    <h2>Change your account settings</h2>
+    <h2>@L["Change your account settings"]</h2>
     <hr />
     <div class="row">
         <div class="col-md-3">
@@ -24,6 +25,3 @@
     </div>
 </div>
 
-@section Scripts {
-    @RenderSection("Scripts", required: false)
-}

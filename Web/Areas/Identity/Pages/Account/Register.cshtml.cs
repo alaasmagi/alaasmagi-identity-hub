@@ -3,8 +3,11 @@ using Application.Auth;
 using Application.Auth.Requests;
 using Application.ExternalAuth;
 using Contracts.DataAccess;
+using DTO.DataAccess.DTO;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Web.Services;
 
 namespace Web.Areas.Identity.Pages.Account;
 
@@ -13,15 +16,21 @@ public class RegisterModel : PageModel
     private readonly IAuthService _authService;
     private readonly IExternalAuthService _externalAuthService;
     private readonly IClientRepository _clientRepository;
+    private readonly UserManager<AppUserEntity> _userManager;
+    private readonly AdminProvisioningService _adminProvisioningService;
 
     public RegisterModel(
         IAuthService authService,
         IExternalAuthService externalAuthService,
-        IClientRepository clientRepository)
+        IClientRepository clientRepository,
+        UserManager<AppUserEntity> userManager,
+        AdminProvisioningService adminProvisioningService)
     {
         _authService = authService;
         _externalAuthService = externalAuthService;
         _clientRepository = clientRepository;
+        _userManager = userManager;
+        _adminProvisioningService = adminProvisioningService;
     }
 
     [BindProperty]
@@ -79,8 +88,20 @@ public class RegisterModel : PageModel
         var result = await _authService.RegisterAsync(new RegisterRequest(Input.Email, Input.Password, Input.FullName));
         if (!result.IsSuccess)
         {
-            ModelState.AddModelError(string.Empty, AccountFlow.ToDisplayError(result.Error));
+            ModelState.AddModelError(string.Empty, AccountFlow.ToDisplayError(this, result.Error));
             return Page();
+        }
+
+        var isConfiguredAdmin = false;
+        var user = await _userManager.FindByIdAsync(result.Value!.UserId.ToString());
+        if (user is not null)
+        {
+            isConfiguredAdmin = await _adminProvisioningService.EnsureConfiguredAdminAsync(user);
+        }
+
+        if (isConfiguredAdmin)
+        {
+            return RedirectToPage("./Login", AccountFlow.RouteValues(ClientId, RedirectUri, returnUrl: ReturnUrl));
         }
 
         return RedirectToPage("./RegisterConfirmation", AccountFlow.RouteValues(ClientId, RedirectUri, returnUrl: ReturnUrl));

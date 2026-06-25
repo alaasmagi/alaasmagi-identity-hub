@@ -72,7 +72,7 @@ public sealed class ExternalAuthService : IExternalAuthService
 
         if (!AuthWorkflow.IsRedirectUriAllowed(client, request.RedirectUri))
         {
-            return Result<ExternalCallbackResponse>.Failure("InvalidRedirectUri");
+            return Result<ExternalCallbackResponse>.Failure("RedirectUriNotAllowed");
         }
 
         var info = await _signInManager.GetExternalLoginInfoAsync();
@@ -160,6 +160,11 @@ public sealed class ExternalAuthService : IExternalAuthService
         if (payload is null || payload.ClientId != client.ClientId.ToString())
         {
             return Result<ClaimsResponse>.Failure("InvalidCode");
+        }
+
+        if (!AuthWorkflow.IsRedirectUriAllowed(client, payload.RedirectUri))
+        {
+            return Result<ClaimsResponse>.Failure("RedirectUriNotAllowed");
         }
 
         var user = await _userManager.FindByIdAsync(payload.UserId);

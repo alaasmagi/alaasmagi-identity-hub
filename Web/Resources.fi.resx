@@ -1,0 +1,699 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="2FA has been disabled. You can reenable 2FA when you set up an authenticator app." xml:space="preserve">
+    <value>2FA on poistettu käytöstä. Voit ottaa 2FA:n uudelleen käyttöön määrittämällä todennussovelluksen.</value>
+  </data>
+  <data name="A user id and token must be supplied for password reset." xml:space="preserve">
+    <value>Salasanan palautukseen täytyy antaa käyttäjätunnus ja tunnus.</value>
+  </data>
+  <data name="Active" xml:space="preserve">
+    <value>Aktiivinen</value>
+  </data>
+  <data name="Add authenticator app" xml:space="preserve">
+    <value>Lisää todennussovellus</value>
+  </data>
+  <data name="Allowed Origins" xml:space="preserve">
+    <value>Sallitut lähteet</value>
+  </data>
+  <data name="An error occurred while processing your request." xml:space="preserve">
+    <value>Pyyntöä käsiteltäessä tapahtui virhe.</value>
+  </data>
+  <data name="ApplicationName" xml:space="preserve">
+    <value>Identiteettikeskus</value>
+  </data>
+  <data name="Approve" xml:space="preserve">
+    <value>Hyväksy</value>
+  </data>
+  <data name="Are you sure you want to delete this client?" xml:space="preserve">
+    <value>Haluatko varmasti poistaa tämän asiakkaan?</value>
+  </data>
+  <data name="Are you sure you want to delete this role?" xml:space="preserve">
+    <value>Haluatko varmasti poistaa tämän roolin?</value>
+  </data>
+  <data name="Authenticator app" xml:space="preserve">
+    <value>Todennussovellus</value>
+  </data>
+  <data name="Authenticator code" xml:space="preserve">
+    <value>Todennuskoodi</value>
+  </data>
+  <data name="Authorize application" xml:space="preserve">
+    <value>Valtuuta sovellus</value>
+  </data>
+  <data name="AuthorizeApplicationMessage" xml:space="preserve">
+    <value>{0} haluaa käyttää tiliäsi.</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>Takaisin</value>
+  </data>
+  <data name="Back to Clients" xml:space="preserve">
+    <value>Takaisin asiakkaisiin</value>
+  </data>
+  <data name="Back to List" xml:space="preserve">
+    <value>Takaisin luetteloon</value>
+  </data>
+  <data name="Back to sign in" xml:space="preserve">
+    <value>Takaisin kirjautumiseen</value>
+  </data>
+  <data name="Back to users" xml:space="preserve">
+    <value>Takaisin käyttäjiin</value>
+  </data>
+  <data name="Ban" xml:space="preserve">
+    <value>Estä</value>
+  </data>
+  <data name="Ban user" xml:space="preserve">
+    <value>Estä käyttäjä</value>
+  </data>
+  <data name="Banned" xml:space="preserve">
+    <value>Estetty</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Peruuta</value>
+  </data>
+  <data name="Change password" xml:space="preserve">
+    <value>Vaihda salasana</value>
+  </data>
+  <data name="Change your account settings" xml:space="preserve">
+    <value>Muuta tilisi asetuksia</value>
+  </data>
+  <data name="Client" xml:space="preserve">
+    <value>Asiakas</value>
+  </data>
+  <data name="Client Details" xml:space="preserve">
+    <value>Asiakkaan tiedot</value>
+  </data>
+  <data name="Client ID" xml:space="preserve">
+    <value>Asiakkaan tunnus</value>
+  </data>
+  <data name="Client ID:" xml:space="preserve">
+    <value>Asiakkaan tunnus:</value>
+  </data>
+  <data name="Client Secret:" xml:space="preserve">
+    <value>Asiakkaan salaisuus:</value>
+  </data>
+  <data name="Client secret shown once." xml:space="preserve">
+    <value>Asiakkaan salaisuus näytetään kerran.</value>
+  </data>
+  <data name="Clients" xml:space="preserve">
+    <value>Asiakkaat</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Sulje</value>
+  </data>
+  <data name="Configure authenticator app" xml:space="preserve">
+    <value>Määritä todennussovellus</value>
+  </data>
+  <data name="Confirm" xml:space="preserve">
+    <value>Vahvista</value>
+  </data>
+  <data name="Confirm Password" xml:space="preserve">
+    <value>Vahvista salasana</value>
+  </data>
+  <data name="Confirm email" xml:space="preserve">
+    <value>Vahvista sähköposti</value>
+  </data>
+  <data name="Confirm new password" xml:space="preserve">
+    <value>Vahvista uusi salasana</value>
+  </data>
+  <data name="Confirm your email address before signing in." xml:space="preserve">
+    <value>Vahvista sähköpostiosoitteesi ennen kirjautumista.</value>
+  </data>
+  <data name="Create" xml:space="preserve">
+    <value>Luo</value>
+  </data>
+  <data name="Create Client" xml:space="preserve">
+    <value>Luo asiakas</value>
+  </data>
+  <data name="Create New" xml:space="preserve">
+    <value>Luo uusi</value>
+  </data>
+  <data name="Create Role" xml:space="preserve">
+    <value>Luo rooli</value>
+  </data>
+  <data name="Create a new account." xml:space="preserve">
+    <value>Luo uusi tili.</value>
+  </data>
+  <data name="CreateAccountToContinueTo" xml:space="preserve">
+    <value>Luo tili jatkaaksesi sovellukseen {0}.</value>
+  </data>
+  <data name="Current password" xml:space="preserve">
+    <value>Nykyinen salasana</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Poista</value>
+  </data>
+  <data name="Delete Client" xml:space="preserve">
+    <value>Poista asiakas</value>
+  </data>
+  <data name="Delete Role" xml:space="preserve">
+    <value>Poista rooli</value>
+  </data>
+  <data name="Deny" xml:space="preserve">
+    <value>Hylkää</value>
+  </data>
+  <data name="Details" xml:space="preserve">
+    <value>Tiedot</value>
+  </data>
+  <data name="Development Mode" xml:space="preserve">
+    <value>Kehitystila</value>
+  </data>
+  <data name="Disable 2FA" xml:space="preserve">
+    <value>Poista 2FA käytöstä</value>
+  </data>
+  <data name="Disable two-factor authentication (2FA)" xml:space="preserve">
+    <value>Poista kaksivaiheinen tunnistautuminen (2FA) käytöstä</value>
+  </data>
+  <data name="Disabling 2FA does not change the keys used in authenticator apps." xml:space="preserve">
+    <value>2FA:n poistaminen käytöstä ei muuta todennussovellusten avaimia.</value>
+  </data>
+  <data name="Don't have access to your authenticator device? You can" xml:space="preserve">
+    <value>Eikö sinulla ole pääsyä todennuslaitteeseen? Voit</value>
+  </data>
+  <data name="Download a two-factor authenticator app like Microsoft Authenticator for" xml:space="preserve">
+    <value>Lataa kaksivaiheinen todennussovellus, kuten Microsoft Authenticator alustalle</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Muokkaa</value>
+  </data>
+  <data name="Edit Client" xml:space="preserve">
+    <value>Muokkaa asiakasta</value>
+  </data>
+  <data name="Edit Role" xml:space="preserve">
+    <value>Muokkaa roolia</value>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>Sähköposti</value>
+  </data>
+  <data name="Enter your email." xml:space="preserve">
+    <value>Anna sähköpostiosoitteesi.</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Virhe</value>
+  </data>
+  <data name="Error confirming your email." xml:space="preserve">
+    <value>Sähköpostin vahvistuksessa tapahtui virhe.</value>
+  </data>
+  <data name="Error from external provider:" xml:space="preserve">
+    <value>Virhe ulkoiselta palveluntarjoajalta:</value>
+  </data>
+  <data name="Error." xml:space="preserve">
+    <value>Virhe.</value>
+  </data>
+  <data name="External login" xml:space="preserve">
+    <value>Ulkoinen kirjautuminen</value>
+  </data>
+  <data name="External login is being processed." xml:space="preserve">
+    <value>Ulkoista kirjautumista käsitellään.</value>
+  </data>
+  <data name="External logins" xml:space="preserve">
+    <value>Ulkoiset kirjautumiset</value>
+  </data>
+  <data name="External registration" xml:space="preserve">
+    <value>Ulkoinen rekisteröityminen</value>
+  </data>
+  <data name="External sign-in" xml:space="preserve">
+    <value>Ulkoinen sisäänkirjautuminen</value>
+  </data>
+  <data name="Filter" xml:space="preserve">
+    <value>Suodata</value>
+  </data>
+  <data name="For local debugging, enable the" xml:space="preserve">
+    <value>Paikallista virheenkorjausta varten ota käyttöön</value>
+  </data>
+  <data name="Forget this browser" xml:space="preserve">
+    <value>Unohda tämä selain</value>
+  </data>
+  <data name="Forgot password confirmation" xml:space="preserve">
+    <value>Salasanan palautuksen vahvistus</value>
+  </data>
+  <data name="Forgot your password?" xml:space="preserve">
+    <value>Unohditko salasanasi?</value>
+  </data>
+  <data name="Full name" xml:space="preserve">
+    <value>Koko nimi</value>
+  </data>
+  <data name="Generate Recovery Codes" xml:space="preserve">
+    <value>Luo palautuskoodit</value>
+  </data>
+  <data name="Generate two-factor authentication (2FA) recovery codes" xml:space="preserve">
+    <value>Luo kaksivaiheisen tunnistautumisen palautuskoodit</value>
+  </data>
+  <data name="Generating new recovery codes does not change the keys used in authenticator apps." xml:space="preserve">
+    <value>Uusien palautuskoodien luonti ei muuta todennussovellusten avaimia.</value>
+  </data>
+  <data name="Granted at" xml:space="preserve">
+    <value>Myönnetty</value>
+  </data>
+  <data name="HelloUser" xml:space="preserve">
+    <value>Hei {0}!</value>
+  </data>
+  <data name="Home" xml:space="preserve">
+    <value>Etusivu</value>
+  </data>
+  <data name="Home Page" xml:space="preserve">
+    <value>Etusivu</value>
+  </data>
+  <data name="IP address" xml:space="preserve">
+    <value>IP-osoite</value>
+  </data>
+  <data name="If email delivery is not configured, the confirmation URL is written to the application log." xml:space="preserve">
+    <value>Jos sähköpostin toimitusta ei ole määritetty, vahvistus-URL kirjoitetaan sovelluslokiin.</value>
+  </data>
+  <data name="If email delivery is not configured, the confirmation token is written to the application log." xml:space="preserve">
+    <value>Jos sähköpostin toimitusta ei ole määritetty, vahvistustunnus kirjoitetaan sovelluslokiin.</value>
+  </data>
+  <data name="If you lose your device and don't have the recovery codes you will lose access to your account." xml:space="preserve">
+    <value>Jos kadotat laitteesi eikä sinulla ole palautuskoodeja, menetät pääsyn tiliisi.</value>
+  </data>
+  <data name="If you wish to change the key used in an authenticator app you should" xml:space="preserve">
+    <value>Jos haluat vaihtaa todennussovelluksen käyttämän avaimen, sinun tulee</value>
+  </data>
+  <data name="Invalid external login request." xml:space="preserve">
+    <value>Virheellinen ulkoinen kirjautumispyyntö.</value>
+  </data>
+  <data name="Invalid login attempt." xml:space="preserve">
+    <value>Virheellinen kirjautumisyritys.</value>
+  </data>
+  <data name="It can result in displaying sensitive information from exceptions to end users." xml:space="preserve">
+    <value>Se voi näyttää loppukäyttäjille poikkeusten arkaluonteisia tietoja.</value>
+  </data>
+  <data name="Learn about" xml:space="preserve">
+    <value>Lue lisää aiheesta</value>
+  </data>
+  <data name="Learn how to" xml:space="preserve">
+    <value>Katso, miten</value>
+  </data>
+  <data name="Log in" xml:space="preserve">
+    <value>Kirjaudu sisään</value>
+  </data>
+  <data name="LogInUsingProvider" xml:space="preserve">
+    <value>Kirjaudu {0}-tililläsi</value>
+  </data>
+  <data name="Login" xml:space="preserve">
+    <value>Kirjaudu</value>
+  </data>
+  <data name="Logout" xml:space="preserve">
+    <value>Kirjaudu ulos</value>
+  </data>
+  <data name="Manage" xml:space="preserve">
+    <value>Hallinta</value>
+  </data>
+  <data name="Manage your account" xml:space="preserve">
+    <value>Hallitse tiliäsi</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Nimi</value>
+  </data>
+  <data name="New client secret shown once." xml:space="preserve">
+    <value>Uusi asiakkaan salaisuus näytetään kerran.</value>
+  </data>
+  <data name="New password" xml:space="preserve">
+    <value>Uusi salasana</value>
+  </data>
+  <data name="Once you have scanned the QR code or input the key above, your two factor authentication app will provide you with a unique code. Enter the code in the confirmation box below." xml:space="preserve">
+    <value>Kun olet skannannut QR-koodin tai syöttänyt yllä olevan avaimen, todennussovellus antaa yksilöllisen koodin. Syötä koodi alla olevaan vahvistuskenttään.</value>
+  </data>
+  <data name="Open registration from a registered client application to use Google or Microsoft." xml:space="preserve">
+    <value>Käytä Googlea tai Microsoftia avaamalla rekisteröityminen rekisteröidystä asiakassovelluksesta.</value>
+  </data>
+  <data name="Open sign-in from a registered client application to use Google or Microsoft." xml:space="preserve">
+    <value>Käytä Googlea tai Microsoftia avaamalla kirjautuminen rekisteröidystä asiakassovelluksesta.</value>
+  </data>
+  <data name="Open sign-in from a registered client application." xml:space="preserve">
+    <value>Avaa kirjautuminen rekisteröidystä asiakassovelluksesta.</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Salasana</value>
+  </data>
+  <data name="Personal data" xml:space="preserve">
+    <value>Henkilötiedot</value>
+  </data>
+  <data name="Please check your email to confirm your account." xml:space="preserve">
+    <value>Tarkista sähköpostisi vahvistaaksesi tilisi.</value>
+  </data>
+  <data name="Please check your email to reset your password." xml:space="preserve">
+    <value>Tarkista sähköpostisi salasanan palauttamista varten.</value>
+  </data>
+  <data name="Privacy" xml:space="preserve">
+    <value>Tietosuoja</value>
+  </data>
+  <data name="Privacy Policy" xml:space="preserve">
+    <value>Tietosuojakäytäntö</value>
+  </data>
+  <data name="Privacy and cookie policy have not been accepted." xml:space="preserve">
+    <value>Tietosuoja- ja evästekäytäntöä ei ole hyväksytty.</value>
+  </data>
+  <data name="Profile" xml:space="preserve">
+    <value>Profiili</value>
+  </data>
+  <data name="Put these codes in a safe place." xml:space="preserve">
+    <value>Säilytä nämä koodit turvallisessa paikassa.</value>
+  </data>
+  <data name="Reason" xml:space="preserve">
+    <value>Syy</value>
+  </data>
+  <data name="Recovery Code" xml:space="preserve">
+    <value>Palautuskoodi</value>
+  </data>
+  <data name="Recovery code verification" xml:space="preserve">
+    <value>Palautuskoodin vahvistus</value>
+  </data>
+  <data name="Recovery codes" xml:space="preserve">
+    <value>Palautuskoodit</value>
+  </data>
+  <data name="RecoveryCodeLoginExplanation" xml:space="preserve">
+    <value>Olet pyytänyt kirjautumista palautuskoodilla. Tätä kirjautumista ei muisteta, ennen kuin annat todennussovelluksen koodin kirjautuessa tai poistat 2FA:n käytöstä ja kirjaudut uudelleen.</value>
+  </data>
+  <data name="RecoveryCodesLeftMessage" xml:space="preserve">
+    <value>Sinulla on {0} palautuskoodia jäljellä.</value>
+  </data>
+  <data name="Regenerate Secret" xml:space="preserve">
+    <value>Luo salaisuus uudelleen</value>
+  </data>
+  <data name="Register" xml:space="preserve">
+    <value>Rekisteröidy</value>
+  </data>
+  <data name="Register as a new user" xml:space="preserve">
+    <value>Rekisteröidy uutena käyttäjänä</value>
+  </data>
+  <data name="Register confirmation" xml:space="preserve">
+    <value>Rekisteröinnin vahvistus</value>
+  </data>
+  <data name="Registration Type" xml:space="preserve">
+    <value>Rekisteröitymistyyppi</value>
+  </data>
+  <data name="Registration type:" xml:space="preserve">
+    <value>Rekisteröitymistyyppi:</value>
+  </data>
+  <data name="Remember me?" xml:space="preserve">
+    <value>Muista minut?</value>
+  </data>
+  <data name="Remember this machine" xml:space="preserve">
+    <value>Muista tämä laite</value>
+  </data>
+  <data name="Request ID:" xml:space="preserve">
+    <value>Pyynnön tunnus:</value>
+  </data>
+  <data name="Resend email confirmation" xml:space="preserve">
+    <value>Lähetä sähköpostivahvistus uudelleen</value>
+  </data>
+  <data name="Reset" xml:space="preserve">
+    <value>Palauta</value>
+  </data>
+  <data name="Reset authenticator app" xml:space="preserve">
+    <value>Nollaa todennussovellus</value>
+  </data>
+  <data name="Reset password" xml:space="preserve">
+    <value>Palauta salasana</value>
+  </data>
+  <data name="Reset password confirmation" xml:space="preserve">
+    <value>Salasanan palautuksen vahvistus</value>
+  </data>
+  <data name="Reset recovery codes" xml:space="preserve">
+    <value>Nollaa palautuskoodit</value>
+  </data>
+  <data name="Reset your password." xml:space="preserve">
+    <value>Palauta salasanasi.</value>
+  </data>
+  <data name="Revoked at" xml:space="preserve">
+    <value>Peruttu</value>
+  </data>
+  <data name="Role Details" xml:space="preserve">
+    <value>Roolin tiedot</value>
+  </data>
+  <data name="Roles" xml:space="preserve">
+    <value>Roolit</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Tallenna</value>
+  </data>
+  <data name="Scan the QR Code or enter this key" xml:space="preserve">
+    <value>Skannaa QR-koodi tai syötä tämä avain</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Hae</value>
+  </data>
+  <data name="Search users" xml:space="preserve">
+    <value>Hae käyttäjiä</value>
+  </data>
+  <data name="Security Events" xml:space="preserve">
+    <value>Tietoturvatapahtumat</value>
+  </data>
+  <data name="Send confirmation" xml:space="preserve">
+    <value>Lähetä vahvistus</value>
+  </data>
+  <data name="Set up authenticator app" xml:space="preserve">
+    <value>Määritä todennussovellus</value>
+  </data>
+  <data name="SignInToContinueTo" xml:space="preserve">
+    <value>Kirjaudu jatkaaksesi sovellukseen {0}.</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>Tila</value>
+  </data>
+  <data name="Store it now; it cannot be viewed again." xml:space="preserve">
+    <value>Tallenna se nyt; sitä ei voi näyttää uudelleen.</value>
+  </data>
+  <data name="Swapping to" xml:space="preserve">
+    <value>Vaihtaminen</value>
+  </data>
+  <data name="Thank you for confirming your email." xml:space="preserve">
+    <value>Kiitos sähköpostisi vahvistamisesta.</value>
+  </data>
+  <data name="The Development environment shouldn't be enabled for deployed applications." xml:space="preserve">
+    <value>Development-ympäristöä ei pidä ottaa käyttöön julkaistuissa sovelluksissa.</value>
+  </data>
+  <data name="The authentication flow could not be completed." xml:space="preserve">
+    <value>Todennusprosessia ei voitu suorittaa.</value>
+  </data>
+  <data name="The consent request is no longer valid." xml:space="preserve">
+    <value>Suostumuspyyntö ei ole enää voimassa.</value>
+  </data>
+  <data name="The consent request requires a signed-in user." xml:space="preserve">
+    <value>Suostumuspyyntö edellyttää kirjautunutta käyttäjää.</value>
+  </data>
+  <data name="The new password and confirmation password do not match." xml:space="preserve">
+    <value>Uusi salasana ja vahvistussalasana eivät täsmää.</value>
+  </data>
+  <data name="The password and confirmation password do not match." xml:space="preserve">
+    <value>Salasana ja vahvistussalasana eivät täsmää.</value>
+  </data>
+  <data name="The recovery code is invalid." xml:space="preserve">
+    <value>Palautuskoodi on virheellinen.</value>
+  </data>
+  <data name="The request could not be completed." xml:space="preserve">
+    <value>Pyyntöä ei voitu suorittaa.</value>
+  </data>
+  <data name="The return address is not valid for this application." xml:space="preserve">
+    <value>Paluuosoite ei ole kelvollinen tälle sovellukselle.</value>
+  </data>
+  <data name="The two-factor login request is no longer valid." xml:space="preserve">
+    <value>Kaksivaiheisen kirjautumisen pyyntö ei ole enää voimassa.</value>
+  </data>
+  <data name="The verification code is invalid." xml:space="preserve">
+    <value>Vahvistuskoodi on virheellinen.</value>
+  </data>
+  <data name="The {0} must be at least {2} and at max {1} characters long." xml:space="preserve">
+    <value>Kentän {0} on oltava vähintään {2} ja enintään {1} merkkiä pitkä.</value>
+  </data>
+  <data name="This action only disables 2FA." xml:space="preserve">
+    <value>Tämä toiminto poistaa vain 2FA:n käytöstä.</value>
+  </data>
+  <data name="This application" xml:space="preserve">
+    <value>Tämä sovellus</value>
+  </data>
+  <data name="Timestamp" xml:space="preserve">
+    <value>Aikaleima</value>
+  </data>
+  <data name="To use an authenticator app go through the following steps:" xml:space="preserve">
+    <value>Käytä todennussovellusta seuraavien vaiheiden mukaan:</value>
+  </data>
+  <data name="Toggle navigation" xml:space="preserve">
+    <value>Näytä tai piilota navigointi</value>
+  </data>
+  <data name="Two-factor authentication" xml:space="preserve">
+    <value>Kaksivaiheinen tunnistautuminen</value>
+  </data>
+  <data name="Two-factor authentication (2FA)" xml:space="preserve">
+    <value>Kaksivaiheinen tunnistautuminen (2FA)</value>
+  </data>
+  <data name="Type" xml:space="preserve">
+    <value>Tyyppi</value>
+  </data>
+  <data name="Unable to load authenticator setup." xml:space="preserve">
+    <value>Todennussovelluksen määritystä ei voitu ladata.</value>
+  </data>
+  <data name="Unable to load the current user." xml:space="preserve">
+    <value>Nykyistä käyttäjää ei voitu ladata.</value>
+  </data>
+  <data name="Unable to load two-factor status." xml:space="preserve">
+    <value>Kaksivaiheisen tunnistautumisen tilaa ei voitu ladata.</value>
+  </data>
+  <data name="Unban" xml:space="preserve">
+    <value>Poista esto</value>
+  </data>
+  <data name="Unban user" xml:space="preserve">
+    <value>Poista käyttäjän esto</value>
+  </data>
+  <data name="Update password" xml:space="preserve">
+    <value>Päivitä salasana</value>
+  </data>
+  <data name="Use a local account to log in." xml:space="preserve">
+    <value>Kirjaudu paikallisella tilillä.</value>
+  </data>
+  <data name="Use another service to log in." xml:space="preserve">
+    <value>Kirjaudu toisella palvelulla.</value>
+  </data>
+  <data name="Use another service to register." xml:space="preserve">
+    <value>Rekisteröidy toisella palvelulla.</value>
+  </data>
+  <data name="Use this page to detail your site's privacy policy." xml:space="preserve">
+    <value>Käytä tätä sivua sivuston tietosuojakäytännön kuvaamiseen.</value>
+  </data>
+  <data name="User" xml:space="preserve">
+    <value>Käyttäjä</value>
+  </data>
+  <data name="User Clients" xml:space="preserve">
+    <value>Käyttäjän asiakkaat</value>
+  </data>
+  <data name="User ID" xml:space="preserve">
+    <value>Käyttäjän tunnus</value>
+  </data>
+  <data name="User agent" xml:space="preserve">
+    <value>Käyttäjäagentti</value>
+  </data>
+  <data name="Users" xml:space="preserve">
+    <value>Käyttäjät</value>
+  </data>
+  <data name="Verification Code" xml:space="preserve">
+    <value>Vahvistuskoodi</value>
+  </data>
+  <data name="Verify" xml:space="preserve">
+    <value>Vahvista</value>
+  </data>
+  <data name="View Clients" xml:space="preserve">
+    <value>Näytä asiakkaat</value>
+  </data>
+  <data name="Welcome" xml:space="preserve">
+    <value>Tervetuloa</value>
+  </data>
+  <data name="You are not invited to access this application." xml:space="preserve">
+    <value>Sinua ei ole kutsuttu käyttämään tätä sovellusta.</value>
+  </data>
+  <data name="You can" xml:space="preserve">
+    <value>Voit</value>
+  </data>
+  <data name="You have 1 recovery code left." xml:space="preserve">
+    <value>Sinulla on 1 palautuskoodi jäljellä.</value>
+  </data>
+  <data name="You have generated new recovery codes." xml:space="preserve">
+    <value>Olet luonut uudet palautuskoodit.</value>
+  </data>
+  <data name="You have no recovery codes left." xml:space="preserve">
+    <value>Sinulla ei ole palautuskoodeja jäljellä.</value>
+  </data>
+  <data name="You must" xml:space="preserve">
+    <value>Sinun täytyy</value>
+  </data>
+  <data name="You must accept the policy before you can enable two factor authentication." xml:space="preserve">
+    <value>Sinun täytyy hyväksyä käytäntö ennen kaksivaiheisen tunnistautumisen käyttöönottoa.</value>
+  </data>
+  <data name="You should" xml:space="preserve">
+    <value>Sinun kannattaa</value>
+  </data>
+  <data name="Your access is waiting for administrator approval." xml:space="preserve">
+    <value>Pääsysi odottaa järjestelmänvalvojan hyväksyntää.</value>
+  </data>
+  <data name="Your access request is waiting for administrator approval." xml:space="preserve">
+    <value>Pääsypyyntösi odottaa järjestelmänvalvojan hyväksyntää.</value>
+  </data>
+  <data name="Your access to this application has been revoked." xml:space="preserve">
+    <value>Pääsysi tähän sovellukseen on peruttu.</value>
+  </data>
+  <data name="Your authenticator app has been verified." xml:space="preserve">
+    <value>Todennussovelluksesi on vahvistettu.</value>
+  </data>
+  <data name="Your login is protected with an authenticator app. Enter your authenticator code below." xml:space="preserve">
+    <value>Kirjautumisesi on suojattu todennussovelluksella. Anna todennuskoodi alla.</value>
+  </data>
+  <data name="Your password has been changed." xml:space="preserve">
+    <value>Salasanasi on vaihdettu.</value>
+  </data>
+  <data name="Your password has been reset. Please" xml:space="preserve">
+    <value>Salasanasi on palautettu. Ole hyvä ja</value>
+  </data>
+  <data name="and" xml:space="preserve">
+    <value>ja</value>
+  </data>
+  <data name="and restarting the app." xml:space="preserve">
+    <value>ja käynnistämällä sovelluksen uudelleen.</value>
+  </data>
+  <data name="before you can log in with a recovery code." xml:space="preserve">
+    <value>ennen kuin voit kirjautua palautuskoodilla.</value>
+  </data>
+  <data name="building Web apps with ASP.NET Core" xml:space="preserve">
+    <value>verkkosovellusten rakentaminen ASP.NET Corella</value>
+  </data>
+  <data name="click here to log in" xml:space="preserve">
+    <value>napsauta tästä kirjautuaksesi</value>
+  </data>
+  <data name="enable QR code generation" xml:space="preserve">
+    <value>ottaa QR-koodin luonti käyttöön</value>
+  </data>
+  <data name="environment by setting the" xml:space="preserve">
+    <value>ympäristö asettamalla</value>
+  </data>
+  <data name="environment variable to" xml:space="preserve">
+    <value>ympäristömuuttujan arvoksi</value>
+  </data>
+  <data name="environment will display more detailed information about the error that occurred." xml:space="preserve">
+    <value>ympäristöön näyttää tarkempia tietoja tapahtuneesta virheestä.</value>
+  </data>
+  <data name="for" xml:space="preserve">
+    <value>alustalle</value>
+  </data>
+  <data name="generate a new set of recovery codes" xml:space="preserve">
+    <value>luoda uuden palautuskoodijoukon</value>
+  </data>
+  <data name="into your two factor authenticator app. Spaces and casing do not matter." xml:space="preserve">
+    <value>kaksivaiheiseen todennussovellukseesi. Välilyönneillä ja kirjainkoolla ei ole merkitystä.</value>
+  </data>
+  <data name="log in with a recovery code" xml:space="preserve">
+    <value>kirjautua palautuskoodilla</value>
+  </data>
+  <data name="or" xml:space="preserve">
+    <value>tai</value>
+  </data>
+  <data name="reset your authenticator keys." xml:space="preserve">
+    <value>nollata todennusavaimesi.</value>
+  </data>
+  <data name="Please confirm your new password." xml:space="preserve">
+    <value>Vahvista uusi salasanasi.</value>
+  </data>
+  <data name="Please confirm your password." xml:space="preserve">
+    <value>Vahvista salasanasi.</value>
+  </data>
+  <data name="Please enter the code." xml:space="preserve">
+    <value>Anna koodi.</value>
+  </data>
+  <data name="Please enter your new password." xml:space="preserve">
+    <value>Anna uusi salasanasi.</value>
+  </data>
+  <data name="Please enter your old password." xml:space="preserve">
+    <value>Anna nykyinen salasanasi.</value>
+  </data>
+  <data name="Please enter your password." xml:space="preserve">
+    <value>Anna salasanasi.</value>
+  </data>
+</root>

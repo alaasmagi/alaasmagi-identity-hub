@@ -1,17 +1,17 @@
 @page
 @model Web.Areas.Admin.Pages.Roles.CreateModel
 @{
-    ViewData["Title"] = "Create Role";
+    ViewData["Title"] = L["Create Role"];
 }
 
-<h1>Create Role</h1>
+<h1>@L["Create Role"]</h1>
 
 <div class="row">
     <div class="col-md-6">
         <form method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-floating mb-3">
-                <input asp-for="Input.Name" class="form-control" placeholder="Name" />
+                <input asp-for="Input.Name" class="form-control" placeholder="@L["Name"]" />
                 <label asp-for="Input.Name" class="form-label"></label>
                 <span asp-validation-for="Input.Name" class="text-danger"></span>
             </div>
@@ -20,12 +20,10 @@
                 <select asp-for="Input.ClientId" asp-items="Model.Clients" class="form-select"></select>
                 <span asp-validation-for="Input.ClientId" class="text-danger"></span>
             </div>
-            <button type="submit" class="btn btn-primary">Create</button>
-            <a asp-page="./Index" class="btn btn-outline-secondary">Back</a>
+            <button type="submit" class="btn btn-primary">@L["Create"]</button>
+            <a asp-page="./Index" class="btn btn-outline-secondary">@L["Back"]</a>
         </form>
     </div>
 </div>
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
+<partial name="_ValidationScriptsPartial" />

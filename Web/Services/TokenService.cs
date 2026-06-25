@@ -6,6 +6,7 @@ using Application.Common;
 using Application.Common.Abstractions;
 using Application.Common.Auth;
 using Domain;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Web.Services;
@@ -13,10 +14,12 @@ namespace Web.Services;
 public sealed class TokenService : ITokenService
 {
     private readonly IConfiguration _configuration;
+    private readonly TokenLifetimeOptions _options;
 
-    public TokenService(IConfiguration configuration)
+    public TokenService(IConfiguration configuration, IOptions<TokenLifetimeOptions> options)
     {
         _configuration = configuration;
+        _options = options.Value;
     }
 
     public string GenerateAccessToken(AppUser user, Client client, IList<string> roles)
@@ -24,7 +27,7 @@ public sealed class TokenService : ITokenService
         var jwtSection = _configuration.GetSection("Jwt");
         var signingKey = GetSigningKey(jwtSection);
         var credentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
-        var expires = DateTime.UtcNow.AddMinutes(GetConfiguredInt(jwtSection, "AccessTokenMinutes", 60));
+        var expires = DateTime.UtcNow.AddSeconds(_options.AccessTokenSeconds);
 
         var claims = new List<Claim>
         {
@@ -72,8 +75,4 @@ public sealed class TokenService : ITokenService
         return new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey));
     }
 
-    private static int GetConfiguredInt(IConfiguration configuration, string key, int fallback)
-    {
-        return int.TryParse(configuration[key], out var value) ? value : fallback;
-    }
 }

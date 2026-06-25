@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Security.Cryptography;
+using Application.Common.Auth;
 using DataAccess.Context;
 using Domain;
 using DTO.DataAccess.DTO;
@@ -49,7 +50,7 @@ public class EditModel : PageModel
             Id = client.Id,
             ClientId = client.ClientId,
             Name = client.Name,
-            AllowedOrigins = client.AllowedOrigins,
+            AllowedOrigins = string.Join('\n', AllowedOriginsHelper.Parse(client.AllowedOrigins)),
             IsActive = client.IsActive,
             RegistrationType = client.RegistrationType
         };
@@ -68,7 +69,7 @@ public class EditModel : PageModel
         if (client is null) return NotFound();
 
         client.Name = Input.Name;
-        client.AllowedOrigins = Input.AllowedOrigins;
+        client.AllowedOrigins = AllowedOriginsHelper.Serialize(ParseAllowedOrigins(Input.AllowedOrigins));
         client.IsActive = Input.IsActive;
         client.RegistrationType = Input.RegistrationType;
         client.UpdatedBy = User.Identity?.Name ?? "admin";
@@ -94,7 +95,7 @@ public class EditModel : PageModel
             Id = client.Id,
             ClientId = client.ClientId,
             Name = client.Name,
-            AllowedOrigins = client.AllowedOrigins,
+            AllowedOrigins = string.Join('\n', AllowedOriginsHelper.Parse(client.AllowedOrigins)),
             IsActive = client.IsActive,
             RegistrationType = client.RegistrationType
         };
@@ -105,5 +106,13 @@ public class EditModel : PageModel
     private void LoadLists()
     {
         RegistrationTypes = new SelectList(Enum.GetValues<ERegistrationType>());
+    }
+
+    private static List<string> ParseAllowedOrigins(string? origins)
+    {
+        return (origins ?? string.Empty)
+            .Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Where(origin => !string.IsNullOrWhiteSpace(origin))
+            .ToList();
     }
 }

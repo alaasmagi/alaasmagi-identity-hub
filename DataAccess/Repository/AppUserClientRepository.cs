@@ -25,6 +25,7 @@ public class AppUserClientRepository : BaseRepository<AppUserClient, AppUserClie
         var entity = await _context.AppUserClients
             .AsNoTracking()
             .Include(userClient => userClient.User)
+            .Include(userClient => userClient.Client)
             .FirstOrDefaultAsync(userClient => userClient.UserId == userId && userClient.ClientId == clientId);
 
         return _mapper.Map(entity);
@@ -35,6 +36,7 @@ public class AppUserClientRepository : BaseRepository<AppUserClient, AppUserClie
         var entities = await _context.AppUserClients
             .AsNoTracking()
             .Include(userClient => userClient.User)
+            .Include(userClient => userClient.Client)
             .Where(userClient => userClient.UserId == userId)
             .ToListAsync();
 
@@ -46,6 +48,7 @@ public class AppUserClientRepository : BaseRepository<AppUserClient, AppUserClie
         var entities = await _context.AppUserClients
             .AsNoTracking()
             .Include(userClient => userClient.User)
+            .Include(userClient => userClient.Client)
             .Where(userClient => userClient.ClientId == clientId)
             .ToListAsync();
 
