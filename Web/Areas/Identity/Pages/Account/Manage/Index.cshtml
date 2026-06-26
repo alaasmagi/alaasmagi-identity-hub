@@ -1,0 +1,29 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = L["Profile"];
+    ViewData["ActivePage"] = ManageNavPages.Index;
+}
+
+<h3>@ViewData["Title"]</h3>
+
+<dl class="row">
+    <dt class="col-sm-3">@L["Full name"]</dt>
+    <dd class="col-sm-9">@Model.Input.FullName</dd>
+
+    <dt class="col-sm-3">@L["Email"]</dt>
+    <dd class="col-sm-9">
+        @Model.Input.Email
+        @if (Model.IsEmailConfirmed)
+        {
+            <span class="badge text-bg-success ms-2">@L["Confirmed"]</span>
+        }
+        else
+        {
+            <span class="badge text-bg-warning ms-2">@L["Not confirmed"]</span>
+        }
+    </dd>
+
+    <dt class="col-sm-3">@L["Username"]</dt>
+    <dd class="col-sm-9">@Model.Username</dd>
+</dl>

@@ -119,6 +119,7 @@ builder.Services.AddControllersWithViews()
 builder.Services.AddRazorPages(options =>
 {
     options.Conventions.AuthorizeAreaFolder("Admin", "/", "AdminArea");
+    options.Conventions.AuthorizeAreaFolder("Identity", "/Account/Manage", "IdentityApplication");
 }).AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
     .AddDataAnnotationsLocalization(options =>
     {
@@ -126,6 +127,11 @@ builder.Services.AddRazorPages(options =>
 });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("IdentityApplication", policy =>
+    {
+        policy.AuthenticationSchemes.Add(IdentityConstants.ApplicationScheme);
+        policy.RequireAuthenticatedUser();
+    })
     .AddPolicy("AdminArea", policy =>
     {
         policy.AuthenticationSchemes.Add(IdentityConstants.ApplicationScheme);
