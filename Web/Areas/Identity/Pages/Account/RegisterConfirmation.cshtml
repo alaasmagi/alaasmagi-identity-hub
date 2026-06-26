@@ -8,9 +8,18 @@
 <p>
     @L["Please check your email to confirm your account."]
 </p>
-<p class="text-muted">
-    @L["If email delivery is not configured, the confirmation token is written to the application log."]
-</p>
+@if (Model.IsEmailDeliveryConfigured)
+{
+    <p class="text-muted">
+        @L["A confirmation email has been sent using the configured email provider."]
+    </p>
+}
+else
+{
+    <p class="text-muted">
+        @L["If email delivery is not configured, the confirmation token is written to the application log."]
+    </p>
+}
 <p>
     <a asp-page="./Login"
        asp-route-clientId="@Model.ClientId"

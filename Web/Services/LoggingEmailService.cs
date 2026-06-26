@@ -1,5 +1,7 @@
+using System.Text;
 using Application.Common.Abstractions;
 using Domain;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace Web.Services;
 
@@ -16,7 +18,8 @@ public sealed class LoggingEmailService : IEmailService
 
     public Task SendEmailConfirmationAsync(AppUser user, string token)
     {
-        var confirmationUrl = BuildUrl($"/Identity/Account/ConfirmEmail?userId={user.Id}&token={Uri.EscapeDataString(token)}");
+        var code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+        var confirmationUrl = BuildUrl($"/Identity/Account/ConfirmEmail?userId={user.Id}&code={code}");
         _logger.LogInformation(
             "Email confirmation URL generated for user {UserId} ({Email}): {ConfirmationUrl}",
             user.Id,
@@ -28,11 +31,13 @@ public sealed class LoggingEmailService : IEmailService
 
     public Task SendPasswordResetAsync(AppUser user, string token)
     {
+        var code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+        var resetUrl = BuildUrl($"/Identity/Account/ResetPassword?userId={user.Id}&code={code}");
         _logger.LogInformation(
-            "Password reset token generated for user {UserId} ({Email}): {Token}",
+            "Password reset URL generated for user {UserId} ({Email}): {ResetUrl}",
             user.Id,
             user.Email,
-            token);
+            resetUrl);
 
         return Task.CompletedTask;
     }

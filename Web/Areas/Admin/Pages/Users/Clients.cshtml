@@ -34,6 +34,7 @@
         var item = row.UserClient;
         var isActive = item?.Status == EUserClientStatus.Active;
         var assignedRoles = row.AssignedRoles.ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var rolesFormId = $"roles-{row.Client.Id:N}";
         <tr>
             <td>
                 <div>@row.Client.Name</div>
@@ -45,7 +46,7 @@
             <td>
                 @if (isActive)
                 {
-                    <form method="post" asp-page-handler="Roles" asp-route-userId="@Model.UserId" asp-route-clientId="@row.Client.Id">
+                    <form id="@rolesFormId" method="post" asp-page-handler="Roles" asp-route-userId="@Model.UserId" asp-route-clientId="@row.Client.Id">
                         @if (row.AvailableRoles.Count == 0)
                         {
                             <span class="text-muted">@L["No roles"]</span>
@@ -65,7 +66,6 @@
                                 </div>
                             }
                         }
-                        <button type="submit" class="btn btn-sm btn-outline-primary mt-2">@L["Save Roles"]</button>
                     </form>
                 }
                 else
@@ -74,24 +74,27 @@
                 }
             </td>
             <td class="text-end">
-                @if (item?.Status == EUserClientStatus.Pending)
-                {
-                    <form method="post" asp-page-handler="Approve" asp-route-userId="@Model.UserId" asp-route-clientId="@row.Client.Id" class="d-inline">
-                        <button type="submit" class="btn btn-sm btn-primary">@L["Approve"]</button>
-                    </form>
-                }
-                @if (isActive)
-                {
-                    <form method="post" asp-page-handler="Revoke" asp-route-userId="@Model.UserId" asp-route-clientId="@row.Client.Id" class="d-inline">
-                        <button type="submit" class="btn btn-sm btn-outline-danger">@L["Revoke"]</button>
-                    </form>
-                }
-                else if (item?.Status != EUserClientStatus.Pending)
-                {
-                    <form method="post" asp-page-handler="Grant" asp-route-userId="@Model.UserId" asp-route-clientId="@row.Client.Id" class="d-inline">
-                        <button type="submit" class="btn btn-sm btn-outline-primary">@L["Grant"]</button>
-                    </form>
-                }
+                <div class="d-inline-flex gap-2 align-items-start">
+                    @if (item?.Status == EUserClientStatus.Pending)
+                    {
+                        <form method="post" asp-page-handler="Approve" asp-route-userId="@Model.UserId" asp-route-clientId="@row.Client.Id">
+                            <button type="submit" class="btn btn-sm btn-primary">@L["Approve"]</button>
+                        </form>
+                    }
+                    @if (isActive)
+                    {
+                        <button type="submit" form="@rolesFormId" class="btn btn-sm btn-outline-primary">@L["Save Roles"]</button>
+                        <form method="post" asp-page-handler="Revoke" asp-route-userId="@Model.UserId" asp-route-clientId="@row.Client.Id">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">@L["Revoke"]</button>
+                        </form>
+                    }
+                    else if (item?.Status != EUserClientStatus.Pending)
+                    {
+                        <form method="post" asp-page-handler="Grant" asp-route-userId="@Model.UserId" asp-route-clientId="@row.Client.Id">
+                            <button type="submit" class="btn btn-sm btn-outline-primary">@L["Grant"]</button>
+                        </form>
+                    }
+                </div>
             </td>
         </tr>
     }

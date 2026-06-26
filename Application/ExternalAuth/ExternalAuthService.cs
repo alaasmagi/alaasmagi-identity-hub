@@ -127,6 +127,8 @@ public sealed class ExternalAuthService : IExternalAuthService
             return Result<ExternalCallbackResponse>.Failure("InvalidCredentials");
         }
 
+        await _signInManager.SignInAsync(user, isPersistent: false);
+
         var userClient = await _userClientRepository.GetByUserAndClientAsync(user.Id, client.ClientId);
         if (userClient is null)
         {
@@ -135,7 +137,11 @@ public sealed class ExternalAuthService : IExternalAuthService
         }
 
         if (userClient.Status == EUserClientStatus.Pending) return Result<ExternalCallbackResponse>.Failure("AwaitingApproval");
-        if (userClient.Status == EUserClientStatus.Revoked) return Result<ExternalCallbackResponse>.Failure("AccessRevoked");
+        if (userClient.Status == EUserClientStatus.Revoked)
+        {
+            var consentToken = await _authWorkflow.CreateConsentTokenAsync(user, client, "cookie", request.RedirectUri);
+            return Result<ExternalCallbackResponse>.Success(new ExternalCallbackResponse(null, RequiresConsent: true, consentToken));
+        }
 
         var code = _tokenService.GenerateAuthCode(user.Id.ToString(), client.ClientId.ToString(), request.RedirectUri);
         await _securityEventService.LogAsync(ESecurityEventType.Login, user.ToDomainUser(), client, null, null);

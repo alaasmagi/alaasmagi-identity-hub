@@ -1,6 +1,7 @@
 using Application.ExternalAuth;
 using Application.ExternalAuth.Requests;
-using Microsoft.AspNetCore.Authentication;
+using DTO.DataAccess.DTO;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -9,10 +10,14 @@ namespace Web.Areas.Identity.Pages.Account;
 public class ExternalLoginModel : PageModel
 {
     private readonly IExternalAuthService _externalAuthService;
+    private readonly SignInManager<AppUserEntity> _signInManager;
 
-    public ExternalLoginModel(IExternalAuthService externalAuthService)
+    public ExternalLoginModel(
+        IExternalAuthService externalAuthService,
+        SignInManager<AppUserEntity> signInManager)
     {
         _externalAuthService = externalAuthService;
+        _signInManager = signInManager;
     }
 
     [BindProperty(SupportsGet = true)]
@@ -43,9 +48,10 @@ public class ExternalLoginModel : PageModel
         var redirectUrl = Url.Page(
             "./ExternalLogin",
             pageHandler: "Callback",
-            values: new { provider, clientId = ClientId, redirectUri = RedirectUri, tenantId = TenantId, returnUrl = ReturnUrl });
+            values: new { provider, clientId = ClientId, redirectUri = RedirectUri, tenantId = TenantId, returnUrl = ReturnUrl })
+            ?? throw new InvalidOperationException("External login callback URL could not be generated.");
 
-        var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
+        var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
         properties.Items["clientId"] = ClientId.ToString();
         properties.Items["redirectUri"] = RedirectUri;
         if (!string.IsNullOrWhiteSpace(TenantId))

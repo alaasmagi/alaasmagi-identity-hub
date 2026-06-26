@@ -1,8 +1,9 @@
 using Application.ExternalAuth;
 using Application.ExternalAuth.Requests;
 using Application.ExternalAuth.Responses;
-using Microsoft.AspNetCore.Authentication;
+using DTO.DataAccess.DTO;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.WebUtilities;
@@ -21,14 +22,19 @@ namespace Web.Controllers;
 public sealed class ExternalController : ApiControllerBase
 {
     private readonly IExternalAuthService _externalAuthService;
+    private readonly SignInManager<AppUserEntity> _signInManager;
 
     /// <summary>
     /// Initializes a new external authentication controller.
     /// </summary>
     /// <param name="externalAuthService">The external authentication service.</param>
-    public ExternalController(IExternalAuthService externalAuthService)
+    /// <param name="signInManager">The ASP.NET Identity sign-in manager.</param>
+    public ExternalController(
+        IExternalAuthService externalAuthService,
+        SignInManager<AppUserEntity> signInManager)
     {
         _externalAuthService = externalAuthService;
+        _signInManager = signInManager;
     }
 
     /// <summary>
@@ -74,7 +80,7 @@ public sealed class ExternalController : ApiControllerBase
                 tenantId = request.TenantId
             }) ?? "/api/auth/external/callback";
 
-        var properties = new AuthenticationProperties { RedirectUri = callbackUrl };
+        var properties = _signInManager.ConfigureExternalAuthenticationProperties(request.Provider, callbackUrl);
         properties.Items["clientId"] = request.ClientId.ToString();
         properties.Items["redirectUri"] = request.RedirectUri;
         if (!string.IsNullOrWhiteSpace(request.TenantId))

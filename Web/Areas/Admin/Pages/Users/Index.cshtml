@@ -6,6 +6,11 @@
 
 <h1>@L["Users"]</h1>
 
+@if (!string.IsNullOrWhiteSpace(Model.StatusMessage))
+{
+    <div class="alert alert-info" role="alert">@Model.StatusMessage</div>
+}
+
 <form method="get" class="row g-2 mb-3">
     <div class="col-md-6">
         <input asp-for="Search" class="form-control" placeholder="@L["Search users"]" />
@@ -34,8 +39,18 @@
             <td>@user.IsActive</td>
             <td>@user.IsBanned</td>
             <td class="text-end">
-                <a asp-page="./Clients" asp-route-userId="@user.UserId" class="btn btn-sm btn-outline-primary">@L["Manage Access"]</a>
-                <a asp-page="./Ban" asp-route-userId="@user.UserId" asp-route-isBanned="@user.IsBanned" class="btn btn-sm btn-outline-secondary">@(user.IsBanned ? L["Unban"] : L["Ban"])</a>
+                <div class="d-inline-flex gap-2 align-items-start">
+                    <a asp-page="./Clients" asp-route-userId="@user.UserId" class="btn btn-sm btn-outline-primary">@L["Manage Access"]</a>
+                    <a asp-page="./Ban" asp-route-userId="@user.UserId" asp-route-isBanned="@user.IsBanned" class="btn btn-sm btn-outline-secondary">@(user.IsBanned ? L["Unban"] : L["Ban"])</a>
+                    <form method="post"
+                          asp-page-handler="Delete"
+                          asp-route-userId="@user.UserId"
+                          asp-route-search="@Model.Search"
+                          asp-route-pageNumber="@Model.PageNumber"
+                          onsubmit="return confirm('Delete this user from the database?');">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">@L["Delete"]</button>
+                    </form>
+                </div>
             </td>
         </tr>
     }

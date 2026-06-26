@@ -60,14 +60,16 @@ public class ConsentModel : PageModel
                 ModelState.AddModelError(string.Empty, AccountFlow.ToDisplayError(this, result.Error));
             }
 
-            await LoadConsentInfoAsync();
+            if (result.Error != "InvalidConsentToken")
+            {
+                await LoadConsentInfoAsync();
+            }
             return Page();
         }
 
         if (result.Value.Status == EUserClientStatus.Pending)
         {
             Message = AccountFlow.Text(this, "Your access request is waiting for administrator approval.");
-            await LoadConsentInfoAsync();
             return Page();
         }
 

@@ -1,8 +1,10 @@
+using System.Text;
 using System.ComponentModel.DataAnnotations;
 using Application.Auth;
 using Application.Auth.Requests;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace Web.Areas.Identity.Pages.Account;
 
@@ -39,7 +41,7 @@ public class ResetPasswordModel : PageModel
 
     public IActionResult OnGet(Guid userId, string? token = null, string? code = null)
     {
-        var resetToken = token ?? code;
+        var resetToken = token ?? DecodeCode(code);
         if (userId == Guid.Empty || string.IsNullOrWhiteSpace(resetToken))
         {
             return BadRequest(AccountFlow.Text(this, "A user id and token must be supplied for password reset."));
@@ -52,6 +54,23 @@ public class ResetPasswordModel : PageModel
         };
 
         return Page();
+    }
+
+    private static string? DecodeCode(string? code)
+    {
+        if (string.IsNullOrWhiteSpace(code))
+        {
+            return null;
+        }
+
+        try
+        {
+            return Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
+        }
+        catch (FormatException)
+        {
+            return null;
+        }
     }
 
     public async Task<IActionResult> OnPostAsync()

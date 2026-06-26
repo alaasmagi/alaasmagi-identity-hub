@@ -63,7 +63,11 @@ public sealed class AuthWorkflow
         return userClient.Status switch
         {
             EUserClientStatus.Pending => new LoginResponse { Error = "AwaitingApproval" },
-            EUserClientStatus.Revoked => new LoginResponse { Error = "AccessRevoked" },
+            EUserClientStatus.Revoked => new LoginResponse
+            {
+                RequiresConsent = true,
+                ConsentToken = await CreateConsentTokenAsync(user, client, responseType, redirectUri)
+            },
             EUserClientStatus.Active => await IssueLoginResponseAsync(user, client, responseType, redirectUri),
             _ => new LoginResponse { Error = "InvalidUserClientStatus" }
         };

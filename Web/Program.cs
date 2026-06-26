@@ -87,7 +87,21 @@ builder.Services.AddScoped<IAppRoleRepository, AppRoleRepository>();
 builder.Services.AddScoped<IAppUserClientRepository, AppUserClientRepository>();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<ISecurityEventRepository, SecurityEventRepository>();
-builder.Services.AddScoped<IEmailService, LoggingEmailService>();
+var brevoApiKey = builder.Configuration["Brevo:ApiKey"] ?? Environment.GetEnvironmentVariable("BREVO_API_KEY");
+var brevoSenderEmail = builder.Configuration["Brevo:SenderEmail"] ?? Environment.GetEnvironmentVariable("BREVO_SENDER_EMAIL");
+if (!string.IsNullOrWhiteSpace(brevoApiKey) && !string.IsNullOrWhiteSpace(brevoSenderEmail))
+{
+    builder.Services.Configure<BrevoEmailOptions>(options =>
+    {
+        options.ApiKey = brevoApiKey;
+        options.SenderEmail = brevoSenderEmail;
+    });
+    builder.Services.AddHttpClient<IEmailService, BrevoEmailService>();
+}
+else
+{
+    builder.Services.AddScoped<IEmailService, LoggingEmailService>();
+}
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ISecurityEventService, SecurityEventService>();
 builder.Services.AddScoped<MainClientResolver>();
@@ -157,7 +171,13 @@ builder.Services.AddRateLimiter(options =>
             }));
 
     options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
-        RateLimitPartition.GetFixedWindowLimiter(
+    {
+        if (!context.Request.Path.StartsWithSegments("/api"))
+        {
+            return RateLimitPartition.GetNoLimiter("non-api");
+        }
+
+        return RateLimitPartition.GetFixedWindowLimiter(
             partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
             factory: _ => new FixedWindowRateLimiterOptions
             {
@@ -165,7 +185,8 @@ builder.Services.AddRateLimiter(options =>
                 Window = TimeSpan.FromSeconds(60),
                 QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
                 QueueLimit = 0
-            }));
+            });
+    });
 });
 
 var authenticationBuilder = builder.Services
@@ -203,6 +224,7 @@ if (!string.IsNullOrWhiteSpace(googleClientId) && !string.IsNullOrWhiteSpace(goo
     {
         options.ClientId = googleClientId;
         options.ClientSecret = googleClientSecret;
+        options.SignInScheme = IdentityConstants.ExternalScheme;
     });
 }
 
@@ -214,6 +236,7 @@ if (!string.IsNullOrWhiteSpace(microsoftClientId) && !string.IsNullOrWhiteSpace(
     {
         options.ClientId = microsoftClientId;
         options.ClientSecret = microsoftClientSecret;
+        options.SignInScheme = IdentityConstants.ExternalScheme;
     });
 }
 
