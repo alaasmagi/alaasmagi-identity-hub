@@ -1,5 +1,5 @@
 ﻿services:
-  identity-hub  :
+  web:
     image: ${IMAGE_NAME:-alaasmagi-identity-hub}:${IMAGE_TAG:-latest}
     restart: unless-stopped
     env_file:
