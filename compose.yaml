@@ -1,5 +1,5 @@
 ﻿services:
-  web:
+  identity-hub  :
     image: ${IMAGE_NAME:-alaasmagi-identity-hub}:${IMAGE_TAG:-latest}
     restart: unless-stopped
     env_file:
@@ -9,3 +9,5 @@
       ASPNETCORE_URLS: http://+:${APP_PORT:-8080}
     ports:
       - "${HOST_PORT:-8080}:${APP_PORT:-8080}"
+    networks:
+        - proxy
