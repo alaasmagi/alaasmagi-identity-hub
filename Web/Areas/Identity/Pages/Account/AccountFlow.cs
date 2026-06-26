@@ -100,11 +100,16 @@ public static class AccountFlow
             "InvalidClient" => "Open sign-in from a registered client application.",
             "InvalidCredentials" => "Invalid login attempt.",
             "InvalidRedirectUri" => "The return address is not valid for this application.",
+            "RedirectUriNotAllowed" => "The return address is not valid for this application.",
             "NotInvited" => "You are not invited to access this application.",
             "InvalidConsentToken" => "The consent request is no longer valid.",
             "InvalidTempToken" => "The two-factor login request is no longer valid.",
             "InvalidCode" => "The verification code is invalid.",
             "InvalidRecoveryCode" => "The recovery code is invalid.",
+            "ExternalLoginNotFound" => "The external sign-in session expired. Try again.",
+            "ExternalEmailMissing" => "The external account did not provide an email address.",
+            "ExternalUserCreationFailed" => "The external account could not be created.",
+            "ExternalLoginLinkFailed" => "The external account could not be linked.",
             _ => "The request could not be completed."
         };
     }

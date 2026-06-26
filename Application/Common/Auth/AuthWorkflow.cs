@@ -276,10 +276,35 @@ public sealed class AuthWorkflow
 
     public static bool IsRedirectUriAllowed(Client client, string redirectUri)
     {
-        if (!Uri.TryCreate(redirectUri, UriKind.Absolute, out _)) return false;
+        if (!Uri.TryCreate(redirectUri, UriKind.Absolute, out var redirect)) return false;
 
         var allowedOrigins = AllowedOriginsHelper.Parse(client.AllowedOrigins);
-        return allowedOrigins.Contains(redirectUri, StringComparer.OrdinalIgnoreCase);
+        return allowedOrigins.Any(allowed => IsAllowedRedirectMatch(allowed, redirectUri, redirect));
+    }
+
+    private static bool IsAllowedRedirectMatch(string allowed, string redirectUri, Uri redirect)
+    {
+        if (!Uri.TryCreate(allowed, UriKind.Absolute, out var allowedUri))
+        {
+            return false;
+        }
+
+        if (IsOriginOnly(allowedUri))
+        {
+            return string.Equals(
+                allowedUri.GetLeftPart(UriPartial.Authority),
+                redirect.GetLeftPart(UriPartial.Authority),
+                StringComparison.OrdinalIgnoreCase);
+        }
+
+        return string.Equals(allowed, redirectUri, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool IsOriginOnly(Uri uri)
+    {
+        return string.Equals(uri.AbsolutePath, "/", StringComparison.Ordinal)
+               && string.IsNullOrEmpty(uri.Query)
+               && string.IsNullOrEmpty(uri.Fragment);
     }
 
     private static string TempTokenName(Guid clientId) => $"{ApplicationTokenOptions.TempTokenPrefix}:{clientId:N}";
