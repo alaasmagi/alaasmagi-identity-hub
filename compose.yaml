@@ -10,4 +10,8 @@
     ports:
       - "${HOST_PORT:-8080}:${APP_PORT:-8080}"
     networks:
-        - proxy
+      - proxy
+
+networks:
+  proxy:
+    external: true
